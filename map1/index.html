@@ -92,7 +92,7 @@
          .addTo(map)
          .on('done', function(layer) {
             // get sublayer 0 and set the infowindow template
-            var sublayer = layer.getSubLayer(0);
+            var sublayer = layer.getSubLayer(1);
             sublayer.infowindow.set({
               template:   INFOWINDOW_TEMPLATE,
               width:      300,
