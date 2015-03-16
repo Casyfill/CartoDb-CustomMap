@@ -41,10 +41,17 @@
                   '<a href="#close" class="cartodb-popup-close-button close">x</a>',
                    '<div class="cartodb-popup-content-wrapper">',
                      '<div class="cartodb-popup-content">',
-                       '<h4>{{name}}</h4>',
-                       '<div id="chart_div">',
+                       '<h4 style="font-size:14px;color:black">{{namenew}}</h4>',
+                       '<h5 style="margin:2px">{{city2}}</h5>',
+                       '<div id="chart_pop_div" style="margin-top:10px">',
                        '<script>',
-                       'draw_chart([{{content.data.pop2002}},{{content.data.pop2010}},{{content.data.pop2012}},{{content.data.pop2013}},{{content.data.pop2014}}]);',
+                       'draw_pop_chart([{{content.data.pop2002}},{{content.data.pop2010}},{{content.data.pop2012}},{{content.data.pop2013}},{{content.data.pop2014}}]);',
+            
+                       '</scr' + 'ipt>',
+                       '</div>',
+                       '<div id="chart_salary_div">',
+                       '<script>',
+                       'draw_salary_chart([{{content.data.salary2012}},{{content.data.salary2013}},{{content.data.salary2014}}]);',
                        '</scr' + 'ipt>',
                        '</div>',
                      '</div>',
@@ -54,7 +61,8 @@
 
       // load visualization library from google
       google.load('visualization', '1.0', {'packages':['corechart']});
-      function draw_chart(data) {
+      
+      function draw_pop_chart(data) {
          var data = google.visualization.arrayToDataTable([
             ['', 'Население'],
             ['2002',  data[0]],
@@ -68,9 +76,41 @@
             curveType: 'function',
             legend: { position: "none" },
             width: 300,
-            height: 150,
+            height: 100,
+            lineWidth: 2,
+            colors: ['black'],
+            tooltip: {
+              trigger: 'none'
+            },
+            vAxis: {gridlines: {count:0}}
           };
-          var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+          var chart = new google.visualization.LineChart(document.getElementById('chart_pop_div'));
+          chart.draw(data, options);
+      }
+
+      function draw_salary_chart(data) {
+         var data = google.visualization.arrayToDataTable([
+            ['', 'Средняя зарплата'],
+            ['2002',  null ],
+            ['2010',  null ],
+            ['2012',  data[0]],
+            ['2013',  data[1]],
+            ['2014',  data[2]]
+         ]);
+          var options = {
+            title: 'Средняя зарплата',
+            curveType: 'function',
+            legend: { position: "none" },
+            width: 300,
+            height: 100,
+            lineWidth: 2,
+            colors: ['black'],
+            tooltip: {
+              trigger: 'none'
+            },
+            vAxis: {gridlines: {count:0}}
+          };
+          var chart = new google.visualization.LineChart(document.getElementById('chart_salary_div'));
           chart.draw(data, options);
       }
 
