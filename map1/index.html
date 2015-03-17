@@ -42,15 +42,16 @@
                   '<a href="#close" class="cartodb-popup-close-button close">x</a>',
                    '<div class="cartodb-popup-content-wrapper">',
                      '<div class="cartodb-popup-content">',
-                       '<h4 style="font-size:14px;color:#113a67">{{namenew}}</h4>',
+                       '<h4 style="font-size:16px;color:#113a67">{{namenew}}</h4>',
                        '<h5 style="margin:0px;color:#113a67">{{city2}}</h5>',
-                       '<div id="chart_pop_div" style="margin-top:20px">',
+                       '<p style="font-size:8px;margin-top:4px"> В сравнении со средним по районам города</p>',
+                       '<div id="chart_pop_div" style="margin-top:14px">',
                        '<script>',
                        'draw_pop_chart([{{content.data.pop2002}},{{content.data.pop2010}},{{content.data.pop2012}},{{content.data.pop2013}},{{content.data.pop2014}}]);',
             
                        '</scr' + 'ipt>',
                        '</div>',
-                       '<div id="chart_salary_div">',
+                       '<div id="chart_salary_div" style="margin-top:10px">',
                        '<script>',
                        'draw_salary_chart([{{content.data.salary2012}},{{content.data.salary2013}},{{content.data.salary2014}}]);',
                        '</scr' + 'ipt>',
@@ -79,11 +80,15 @@
             width: 250,
             height: 70,
             lineWidth: 1.5,
-            colors: ['#113a67','lightblue'],
+            colors: ['#113a67','grey'],
+            series: {
+                       0: { lineDashStyle: [1, 0] },
+                       1: { lineDashStyle: [2, 2] },
+                     },
             tooltip: {
               trigger: 'none'
             },
-            vAxis: {gridlines: {count:3}}
+            vAxis: {gridlines: {count:3, color:'#cecece'}}
           };
           var chart = new google.visualization.LineChart(document.getElementById('chart_pop_div'));
           chart.draw(data, options);
@@ -105,11 +110,15 @@
             width: 250,
             height: 70,
             lineWidth: 1.5,
-            colors: ['#113a67','lightblue'],
+            colors: ['#113a67','grey'],
+            series: {
+                       0: { lineDashStyle: [1, 0] },
+                       1: { lineDashStyle: [2, 2] },
+                     },
             tooltip: {
               trigger: 'none'
             },
-            vAxis: {gridlines: {count:3}}
+            vAxis: {gridlines: {count:3, color:'#cecece'}}
           };
           var chart = new google.visualization.LineChart(document.getElementById('chart_salary_div'));
           chart.draw(data, options);
@@ -122,7 +131,8 @@
           zoomControl: false,
           center: [55.737951, 37.626362],
           zoom: 10,
-          infowindow:true
+          infowindow:true,
+          scrollwheel:false
         });
         // add a nice baselayer from Cartodb
         L.tileLayer('https://cartocdn_{s}.global.ssl.fastly.net/base-midnight/{z}/{x}/{y}.png', {
@@ -146,10 +156,17 @@
             console.log("some error occurred");
           });
 
-        vis.map.set({
-                   minZoom: 9,
+        map.set({
+                   minZoom: 10,
                    maxZoom: 11
                  });
+        // disable drag and zoom handlers
+        map.dragging.disable(); 
+        map.touchZoom.disable();
+        map.doubleClickZoom.disable();
+        map.scrollWheelZoom.disable();
+        // disable tap handler, if present.
+        if (map.tap) map.tap.disable();
       }
       window.onload = main;
     </script>
