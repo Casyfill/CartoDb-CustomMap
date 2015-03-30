@@ -1,174 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+  
   <head>
-    <title>Moscow Rayons</title>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-    <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
-    <style>
-      html, body, #map {
-        height: 100%;
-        padding: 0;
-        margin: 0;
-      }
-
-    </style>
-
-    <link rel="stylesheet" href="http://libs.cartodb.com/cartodb.js/v3/3.12/themes/css/cartodb.css" />
+  <meta charset="utf-8">
+  <title>Анализ рынка коммерческой недвижимости, 2015 г.</title>
+  <link rel="shortcut icon" href="img/favicons.png" />
+  <script src="js/d3.v3.js"></script>
+  <script src="js/script.js"></script>
+  <link href="css/styles.css" type="text/css" rel="stylesheet"/>
   </head>
-  <body>
-    <div id="map"></div>
-
-    <script type="infowindow/html" id="infowindow_template">
-    </script>
-
-    <!-- карта -->
-    <script src="http://libs.cartodb.com/cartodb.js/v3/3.11/cartodb.js"></script>
-    <!-- графики -->
-     <script type="text/javascript"
-          src="https://www.google.com/jsapi?autoload={
-            'modules':[{
-              'name':'visualization',
-              'version':'1',
-              'packages':['corechart']
-            }]
-          }"></script>
-    <!-- <script type="text/javascript" src="d3.v2.min.js"></script> -->
-
-    <script>
-      var INFOWINDOW_TEMPLATE = [
-              // '<span> custom </span>',
-                '<div class="cartodb-popup v2">',
-                  '<a href="#close" class="cartodb-popup-close-button close">x</a>',
-                   '<div class="cartodb-popup-content-wrapper">',
-                     '<div class="cartodb-popup-content">',
-                       '<h4 style="font-size:16px;color:#113a67">{{namenew}}</h4>',
-                       '<h5 style="margin:0px;color:#113a67">{{city2}}</h5>',
-                       '<p style="font-size:8px;margin-top:4px"> В сравнении со средним по районам города</p>',
-                       '<div id="chart_pop_div" style="margin-top:14px">',
-                       '<script>',
-                       'draw_pop_chart([{{content.data.pop2002}},{{content.data.pop2010}},{{content.data.pop2012}},{{content.data.pop2013}},{{content.data.pop2014}}]);',
-            
-                       '</scr' + 'ipt>',
-                       '</div>',
-                       '<div id="chart_salary_div" style="margin-top:10px">',
-                       '<script>',
-                       'draw_salary_chart([{{content.data.salary2012}},{{content.data.salary2013}},{{content.data.salary2014}}]);',
-                       '</scr' + 'ipt>',
-                       '</div>',
-                     '</div>',
-                   '</div>',
-                '   <div class="cartodb-popup-tip-container"></div>',
-                '</div>'].join('');
-
-      // load visualization library from google
-      google.load('visualization', '1.0', {'packages':['corechart']});
-      
-      function draw_pop_chart(data) {
-         var data = google.visualization.arrayToDataTable([
-            ['', 'Население', 'Среднее население'],
-            ['2002',  data[0]/1000, 125.240],       
-            ['2010',  data[1]/1000, 141.200],
-            ['2012',  data[2]/1000, 143.220],
-            ['2013',  data[3]/1000, 143.933],
-            ['2014',  data[4]/1000, 145.287]
-         ]);
-          var options = {
-            title: 'Население, тыс. человек',
-            curveType: 'function',
-            legend: { position: "none" },
-            width: 250,
-            height: 70,
-            lineWidth: 1.5,
-            colors: ['#113a67','grey'],
-            series: {
-                       0: { lineDashStyle: [1, 0] },
-                       1: { lineDashStyle: [2, 2] },
-                     },
-            tooltip: {
-              trigger: 'none'
-            },
-            vAxis: {gridlines: {count:3, color:'#cecece'}}
-          };
-          var chart = new google.visualization.LineChart(document.getElementById('chart_pop_div'));
-          chart.draw(data, options);
-      }
-
-      function draw_salary_chart(data) {
-         var data = google.visualization.arrayToDataTable([
-            ['', 'Средняя зарплата', 'Средняя зарплата по району'],
-            ['2002',  null, null ],
-            ['2010',  null, null ],
-            ['2012',  data[0]/1000, 54.834],
-            ['2013',  data[1]/1000, 60.224],
-            ['2014',  data[2]/1000, 66.016]
-         ]);
-          var options = {
-            title: 'Средняя зарплата, тыс. руб.',
-            curveType: 'function',
-            legend: { position: "none" },
-            width: 250,
-            height: 70,
-            lineWidth: 1.5,
-            colors: ['#113a67','grey'],
-            series: {
-                       0: { lineDashStyle: [1, 0] },
-                       1: { lineDashStyle: [2, 2] },
-                     },
-            tooltip: {
-              trigger: 'none'
-            },
-            vAxis: {gridlines: {count:3, color:'#cecece'}}
-          };
-          var chart = new google.visualization.LineChart(document.getElementById('chart_salary_div'));
-          chart.draw(data, options);
-      }
+  
+    <body>
+      <div id='wrapper' >
+        <div id='header'>
+          <div id='titles' display:inline-block;>
+            <h1>Анализ рынка коммерческой недвижимости, 2015 г.</h1>
+            <text id='subtitle'>Выберите город на карте для просмотра  характеристик коммерческой недвижимости</text>
+          </div>
+          <div id="logo" display:inline-block;>
+            <img src="img/logo.png" alt="Rilos"  width="100%" align='right'>
+          </div>
+        </div>
 
 
-      function main() {
-        // create map
-        var map = L.map('map', { 
-          zoomControl: false,
-          center: [55.737951, 37.626362],
-          zoom: 10,
-          infowindow:true,
-          scrollwheel:false
-        });
-        // add a nice baselayer from Cartodb
-        L.tileLayer('https://cartocdn_{s}.global.ssl.fastly.net/base-midnight/{z}/{x}/{y}.png', {
-          attribution: 'CartoDB'
-        }).addTo(map);
 
+        <div id='block1' class='infoblock'>block1</div>	
+        <div id='block2' class='infoblock'>
+          <div class="blockHeader">
+            <h3 id="cityName">г. Иваново, Ивановская область</h3>
+          </div> 
+            block2
+        </div> 
         
-        cartodb.createLayer(map, 'http://cityfish.cartodb.com/api/v2/viz/36a22e32-cb60-11e4-bfa2-0e853d047bba/viz.json')
-         .addTo(map)
-         .on('done', function(layer) {
-            // get sublayer 0 and set the infowindow template
-            var sublayer = layer.getSubLayer(1);
-            sublayer.infowindow.set({
-              template:   INFOWINDOW_TEMPLATE,
-              width:      250,
-              maxHeight:  400
-            });
+        <div id='block3' class='infoblock'>
+          <div class="blockHeader">
+            <h3 id="cityName">
+              ТОП-3 лучших городов
+            </h3>
+          </div> 
+          
+          <div id="chartContainer">            
+          </div>
+          <div id="chartMenu">
+            <div id='menuAligner'>
+              <div class='button'>
+              Население</div>
+              <div class='button'>Коммерческая плотность</div>
+              <div class='button'>GBA</div>
+              <div class='button'>GLA</div>
+            </div>
+            
+            
+          </div>
+
+        </div>
 
 
-          }).on('error', function() {
-            console.log("some error occurred");
-          });
-
-        map.set({
-                   minZoom: 10,
-                   maxZoom: 11
-                 });
-        // disable drag and zoom handlers
-        map.dragging.disable(); 
-        map.touchZoom.disable();
-        map.doubleClickZoom.disable();
-        map.scrollWheelZoom.disable();
-        // disable tap handler, if present.
-        if (map.tap) map.tap.disable();
-      }
-      window.onload = main;
-    </script>
+        <div id='footer' class='infoblock'>
+          <h6>
+            Свяжитесь с нами для получения более подробной информации о наших продуктах и услугах
+          </h6>
+          <p id='contacts'>web-site: <a href='http://www.rilos.ru'>www.rilos.ru</a> | E-mail: <a href="mailto:info@rilos.ru">info@rilos.ru</a> | Tel: +7 499 638 24 14</p>
+        </div> 
+    </div>
   </body>
 </html>
