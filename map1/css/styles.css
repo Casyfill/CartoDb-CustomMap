@@ -5,6 +5,7 @@
 }
 
 
+
 #wrapper {
 	margin:12px;
 	border: 1px solid #a1a1a1;
@@ -55,7 +56,7 @@ h1 {
 
 .infoblock {
 	margin-bottom:25px;
-	height: 400px;
+	height: 350px;
 	/*background-color: rgb(227,229,226);*/
 	border: 1px solid #a1a1a1;
 }
@@ -77,7 +78,21 @@ h3 {
 	 margin: 0px;
 }
 
-
+/*block2*/
+#cityMap {
+	display: inline-block;
+	width: calc(50% - 2px);
+	height: calc(100% - 36px);
+	border-right: 1px solid #a1a1a1;
+}
+#radarWrapper {
+	vertical-align: top;
+	
+	display: inline-block;
+	width: calc(50% - 2px);
+	height: calc(100% - 36px);
+	/*background-color: rgb(178,255,241);*/
+}
 
 /*block3*/
 #block3 {
@@ -90,6 +105,12 @@ h3 {
 	height: 262px;
 
 	background-color: rgb(227,229,226);
+}
+
+#topChart {
+	height: 262px;
+	/*margin:auto;*/
+	/*vertical-align: middle;*/
 }
 
 #chartMenu {
@@ -106,22 +127,56 @@ h3 {
 }
 
 #menuAligner{
-
-	margin-top: 45px;
+	margin-top: 31px;
 }
 
 
 .button {
+	display: table;
 	border: 1px solid #a1a1a1;
 	margin: auto;
-	margin-bottom:10px;
-	padding: 5px;
-	padding-bottom: 0px;
+	margin-bottom:20px;
+	padding-left: 5px;
+	padding-right: 5px;
+	
 	width:150px;
 	min-height: 35px;
-	text-align: center;
-	vertical-align:middle;
 	font-size: 0.9em;
+	background-color: white;
+
+}
+
+.button:hover {
+	background-color: #EDECFA; 	
+}
+
+.buttonClicked {
+	display: table;
+	border: 1px solid #a1a1a1;
+	margin: auto;
+	margin-bottom:20px;
+	padding-left: 5px;
+	padding-right: 5px;
+	
+	width:150px;
+	min-height: 35px;
+	font-size: 0.9em;
+	background-color: #C1C0CA; 	
+
+}
+
+.buttonClicked:hover {
+	background-color: #535859; 	
+}
+
+p.inbutton {
+   display: table-cell;
+  text-align: center; 
+	margin: auto;
+	line-height: 90%;
+	vertical-align: middle;
+	/*position: relative;
+	top:13px*/;
 }
 
 /*FOOTER*/
@@ -144,5 +199,8 @@ h6 {
 	margin-top: 4px;
 	text-align: center; 
 	 
+}
 
+.bar {
+	fill:brown;
 }

@@ -7,7 +7,18 @@
   <link rel="shortcut icon" href="img/favicons.png" />
   <script src="js/d3.v3.js"></script>
   <script src="js/script.js"></script>
+  <script src="http://libs.cartocdn.com/cartodb.js/v3/3.12/cartodb.js"></script>
+
+
   <link href="css/styles.css" type="text/css" rel="stylesheet"/>
+  <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.12/themes/css/cartodb.css" />
+  <style>
+      html, body, #map {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
   </head>
   
     <body>
@@ -24,30 +35,53 @@
 
 
 
-        <div id='block1' class='infoblock'>block1</div>	
+        <div id='block1' class='infoblock'>
+          <div id="map"></div>
+          <!-- <div id="map"></div> -->
+        </div>	
+
+
         <div id='block2' class='infoblock'>
           <div class="blockHeader">
             <h3 id="cityName">г. Иваново, Ивановская область</h3>
           </div> 
-            block2
+          <div id="cityMap">
+            <div id="mapr"></div>
+          </div>
+          <div id="radarWrapper">
+            radar chart
+
+          </div>
         </div> 
         
+
         <div id='block3' class='infoblock'>
           <div class="blockHeader">
             <h3 id="cityName">
-              ТОП-3 лучших городов
+              ТОП-10 лучших городов
             </h3>
           </div> 
           
-          <div id="chartContainer">            
+          <div id="chartContainer">  
+            <div id="topChart">
+              <script>
+                barChart()
+              </script>
+            </div>  
+
           </div>
           <div id="chartMenu">
             <div id='menuAligner'>
-              <div class='button'>
-              Население</div>
-              <div class='button'>Коммерческая плотность</div>
-              <div class='button'>GBA</div>
-              <div class='button'>GLA</div>
+              <div class='button' onclick="clicker()">
+                <p class="inbutton">Население</p>
+              </div>
+              <div class='button' onclick="clicker()">
+                <p class="inbutton">Коммерческая плотность</p>
+              </div>
+              <div class='button' onclick="clicker()">
+              <p class="inbutton">GBA</p></div>
+              <div class='button' onclick="clicker()">
+              <p class="inbutton">GLA</p></div>
             </div>
             
             
@@ -62,6 +96,19 @@
           </h6>
           <p id='contacts'>web-site: <a href='http://www.rilos.ru'>www.rilos.ru</a> | E-mail: <a href="mailto:info@rilos.ru">info@rilos.ru</a> | Tel: +7 499 638 24 14</p>
         </div> 
+
     </div>
+
+    <script>
+      
+      function main() {
+        createMap('map','http://cityfish.cartodb.com/api/v2/viz/90eec28c-cd05-11e4-bf8e-0e018d66dc29/viz.json')
+        // barChart()
+        // createMap('mapr','http://cityfish.cartodb.com/api/v2/viz/90eec28c-cd05-11e4-bf8e-0e018d66dc29/viz.json')
+        
+      }
+      window.onload = main;
+    </script>
+
   </body>
 </html>
