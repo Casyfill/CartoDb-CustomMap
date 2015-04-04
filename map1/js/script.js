@@ -32,9 +32,9 @@ function createMap(mapId, mapLink){
 function barChart(){
 
        // var data2 = d3.csv("data/topdatum.csv") ;
-    var data = d3.csv("data/top_datum.csv", function(d) {
+    var data2 = d3.csv("data/topdatum.csv", function(d) {
           return {
-            name: d.cityname, // convert "Year" column to Date
+            name: d.cityname, 
             population: +d.population,
             commdencity: +d.commdencity,
             gba: +d.gba,
@@ -44,12 +44,11 @@ function barChart(){
           console.log(rows);
         });
 
-    console.log('data');
-    console.log(data2);
+    
 
-    var data = [4, 8, 15, 16, 23, 42, 34, 39, 22, 3];
+    // var data = [4, 8, 15, 16, 23, 42, 34, 39, 22, 3];
     // sorting
-    data.sort(function(a, b){return b-a});
+    // data2.sort(function(a, b){return b-a});
 
     var margin = {top: 30, right: 15, bottom: 30, left: 15};
 
@@ -59,7 +58,7 @@ function barChart(){
 
 
     var x = d3.scale.linear()
-        .domain([0, d3.max(data)])
+        .domain([0, d3.max(data2.population)])
         .range([0, width]);
 
     var svg = d3.select("#topChart")

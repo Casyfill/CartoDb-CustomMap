@@ -201,6 +201,12 @@ h6 {
 	 
 }
 
-.bar {
-	fill:brown;
+#topChart rect {
+  fill: darkblue;
+}
+
+#topChart text {
+  fill: black;
+  font: 10px sans-serif;
+  text-anchor: end;
 }
