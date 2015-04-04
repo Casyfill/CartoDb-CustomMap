@@ -1,3 +1,11 @@
+function clicker(id, c){
+      if (c='Button'){
+        console.log(id)
+        d3.selectAll('.buttonClicked').attr('class','button');
+        d3.select('#'+id).attr('class', 'buttonClicked');
+      } 
+}
+
 function createMap(mapId, mapLink){
         cartodb.createVis(mapId, mapLink, {
             shareable: false,
@@ -31,8 +39,24 @@ function createMap(mapId, mapLink){
 
 function barChart(){
 
-       // var data2 = d3.csv("data/topdatum.csv") ;
-    var data2 = d3.csv("data/topdatum.csv", function(d) {
+    var margin = {top: 30, right: 30, bottom: 30, left: 30};
+
+    var width = 534 - margin.left - margin.right,
+        height = 262 - margin.top - margin.bottom,
+        barHeight = 20;
+
+    var svg = d3.select("#topChart")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("id", 'basic')
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+    var g = d3.select("#basic")
+
+    
+    d3.csv("data/topdatum.csv", function(d) {
           return {
             name: d.cityname, 
             population: +d.population,
@@ -40,48 +64,73 @@ function barChart(){
             gba: +d.gba,
             gla: +d.gla
           };
-        }, function(error, rows) {
-          console.log(rows);
+        }, function(error, data) {
+
+          pop_data = data.sort(function(a,b){return d3.descending(a.population, b.population)}).slice(0,10);
+          den_data = data.sort(function(a,b){return d3.descending(a.commdencity, b.commdencity)}).slice(0,10);
+          gba_data = data.sort(function(a,b){return d3.descending(a.gba, b.gba)}).slice(0,10);
+          gla_data = data.sort(function(a,b){return d3.descending(a.gla, b.gla)}).slice(0,10);
+          
+
+
+          
+          // var curDatum = data.slice([0,1]);
+          // data.forEach(function(d){console.log(d.name + ' ' + d.population)})
+// cityname,population,commdencity,gba,gla
+          // var max = );
+          
+          var x = d3.scale.linear()
+            .domain([0, d3.max(pop_data, function(d) { return d.population })])
+            .range([0, width-100]);
+
+          // console.log(x);
+
+          var bar = g.selectAll('g')
+              .data(pop_data)
+              .enter()
+              .append("g")
+              .attr("transform", function(d, i) { return "translate(100," + i * barHeight + ")"; });
+
+          bar.append("rect")
+              .attr("width", function(d){return x(d.population)})
+              .attr("height", barHeight - 4);
+
+          bar.append("text")
+                .attr("x", -10)
+                .attr("y", (barHeight / 2 -6))
+                .attr("dy", ".75em")
+                .text(function(d) { return d.name; });
+          
         });
 
+    // data2.sort(function(a,b){return d3.descending(a.population, b.population)});
+
     
+
+
 
     // var data = [4, 8, 15, 16, 23, 42, 34, 39, 22, 3];
     // sorting
-    // data2.sort(function(a, b){return b-a});
+    // data.sort(function(a, b){return b-a});
 
-    var margin = {top: 30, right: 15, bottom: 30, left: 15};
-
-    var width = 534 - margin.left - margin.right,
-        height = 262 - margin.top - margin.bottom,
-        barHeight = 20;
-
-
-    var x = d3.scale.linear()
-        .domain([0, d3.max(data2.population)])
-        .range([0, width]);
-
-    var svg = d3.select("#topChart")
-        .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-
-    d3.select("svg")
-        .append("g")
-        .attr("id", 'basic')
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-
-    var g = d3.select("#basic")
     
-    var bar = g.selectAll('g')
-        .data(data)
-        .enter()
-        .append("g")
-        .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
+    // var x = d3.scale.linear()
+    //     .domain([0, d3.max(data)])
+    //     .range([0, width]);
 
-    bar.append("rect")
-        .attr("width", x)
-        .attr("height", barHeight - 4);
+    
+
+    
+    
+    // var bar = g.selectAll('g')
+    //     .data(data)
+    //     .enter()
+    //     .append("g")
+    //     .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
+
+    // bar.append("rect")
+    //     .attr("width", x)
+    //     .attr("height", barHeight - 4);
 
     // bar.append("text")
     //     .attr("x", function(d) { return x(d); })
