@@ -7,11 +7,11 @@
 
 
 #wrapper {
-	margin:12px;
+	margin:0px;
 	border: 1px solid #a1a1a1;
 	padding:25px;
 
-	max-width:776px;
+	width:750px;
 	margin-left: auto;
     margin-right: auto;
 }
@@ -81,17 +81,22 @@ h3 {
 /*block2*/
 #cityMap {
 	display: inline-block;
-	width: calc(50% - 2px);
+	width: 50%;
 	height: calc(100% - 36px);
 	border-right: 1px solid #a1a1a1;
 }
+#map2 {
+	height: 100%;
+}
+
 #radarWrapper {
 	vertical-align: top;
 	
 	display: inline-block;
-	width: calc(50% - 2px);
+	width: 49%;
 	height: calc(100% - 36px);
-	/*background-color: rgb(178,255,241);*/
+	
+	
 }
 
 /*block3*/
@@ -109,6 +114,7 @@ h3 {
 
 #topChart {
 	height: 262px;
+	/*width:75%;*/
 	/*margin:auto;*/
 	/*vertical-align: middle;*/
 }
@@ -161,13 +167,14 @@ h3 {
 	width:150px;
 	min-height: 35px;
 	font-size: 0.9em;
-	background-color: #C1C0CA; 	
+	background-color: rgb(227,229,226) 	
 
 }
 
+/*
 .buttonClicked:hover {
-	background-color: #535859; 	
-}
+	background-color: #AAABAE; 	
+}*/
 
 p.inbutton {
    display: table-cell;
@@ -215,4 +222,48 @@ h6 {
 	text-anchor: end;
 	font: 10px sans-serif;
 	fill:white;
+}
+
+#radar polygon {
+	/*fill:none;*/
+	fill:lime;
+	fill-opacity:0.1;
+	stroke:lime;
+	stroke-width:2px;
+}
+
+#radar circle {
+	
+	fill:lime;
+}
+
+#radar .label {
+	text-anchor: start;
+	font: 11px sans-serif;
+	fill:black;
+	
+}
+
+.axis .name{
+	text-anchor: start;
+	font: 8px sans-serif;
+	fill:black;	
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #a1a1a1;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 8px;
+}
+
+.name {
+    font-family: sans-serif;
+    font-size: 12px;
+    font-weight:bold;
 }
