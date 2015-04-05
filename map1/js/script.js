@@ -1,6 +1,6 @@
 function clicker(id, c){
       if (c='Button'){
-        console.log(id)
+        // console.log(id)
         d3.selectAll('.buttonClicked').attr('class','button');
         d3.select('#'+id).attr('class', 'buttonClicked');
       } 
@@ -55,86 +55,117 @@ function barChart(){
 
     var g = d3.select("#basic")
 
-    
     d3.csv("data/topdatum.csv", function(d) {
           return {
             name: d.cityname, 
-            population: +d.population,
-            commdencity: +d.commdencity,
+            pop: +d.pop,
+            den: +d.den,
             gba: +d.gba,
             gla: +d.gla
           };
         }, function(error, data) {
 
-          pop_data = data.sort(function(a,b){return d3.descending(a.population, b.population)}).slice(0,10);
-          den_data = data.sort(function(a,b){return d3.descending(a.commdencity, b.commdencity)}).slice(0,10);
+          pop_data = data.sort(function(a,b){return d3.descending(a.pop, b.pop)}).slice(0,10);
+          den_data = data.sort(function(a,b){return d3.descending(a.den, b.den)}).slice(0,10);
           gba_data = data.sort(function(a,b){return d3.descending(a.gba, b.gba)}).slice(0,10);
           gla_data = data.sort(function(a,b){return d3.descending(a.gla, b.gla)}).slice(0,10);
           
+          gla_data.forEach(function(d){console.log(d.name + ' ' + d.gla)})
 
-
-          
-          // var curDatum = data.slice([0,1]);
-          // data.forEach(function(d){console.log(d.name + ' ' + d.population)})
-// cityname,population,commdencity,gba,gla
-          // var max = );
+          // var newA = data.sort(function(a,b){return d3.descending(a.pop, b.pop)})
+          //   .slice(0,10);
+          // console.log(newA)
           
           var x = d3.scale.linear()
-            .domain([0, d3.max(pop_data, function(d) { return d.population })])
+            .domain([0, d3.max(pop_data, function(d) { return d.pop })])
             .range([0, width-100]);
 
-          // console.log(x);
 
-          var bar = g.selectAll('g')
-              .data(pop_data)
-              .enter()
+          var bar = g.selectAll('#basic g')
+              .data(pop_data);
+
+          bar.enter()
               .append("g")
               .attr("transform", function(d, i) { return "translate(100," + i * barHeight + ")"; });
 
           bar.append("rect")
-              .attr("width", function(d){return x(d.population)})
+              .attr("width", function(d){return x(d.pop)})
               .attr("height", barHeight - 4);
 
           bar.append("text")
+                .attr("class","name")
                 .attr("x", -10)
                 .attr("y", (barHeight / 2 -6))
                 .attr("dy", ".75em")
-                .text(function(d) { return d.name; });
+                .text(function(d,i) { return (i+1) + '. ' + d.name; });
+
+          bar.append("text")
+                .attr("x", function(d){return x(d.pop)-5})
+                .attr("y", (barHeight / 2 -6))
+                .attr("dy", ".75em")
+                .attr("class","label")
+                .text(function(d,i) { return d.pop });
+
+
+
+          function updateBars(id, bar,data){
+            var x = d3.scale.linear()
+              .domain([0, d3.max(data, function(d) { return d[id] })])
+              .range([0, width-100]);
+
+            console.log('   ' + id)
+            // data.forEach(function(d,i){console.log(i + ' ' + d.name + ' ' + d[id])})
+
+            // bar.exit()
+            bar.data(data)
+
+            bar.select('rect')
+              .transition().delay(function (d,i){ return i * 15;})
+              .attr("width", function(d){return x(d[id])})
+            
+            bar.select('text.name')
+              .text(function(d,i) { return (i+1) + '. ' + d.name; });
+
+            bar.select('text.label')
+              .transition().delay(function (d,i){ return i * 15;})
+              .attr("x", function(d){return x(d[id])-5})
+              .text(function(d,i) { return d[id] });
+
+            
+          }
           
-        });
+          d3.select('#gla').on('click', function(d){updateBars('gla',bar, gla_data)});
+          d3.select('#pop').on('click', function(d){updateBars('pop',bar, pop_data)});
+          d3.select('#gba').on('click', function(d){updateBars('gba',bar, gba_data)});
+          d3.select('#den').on('click', function(d){updateBars('den',bar, den_data)});
+          
 
-    // data2.sort(function(a,b){return d3.descending(a.population, b.population)});
+
+      })
+    } 
+
+
+function radarChart(){
+  var margin = {top: 5, right: 5, bottom: 5, left: 5};
+
+  var width = 358 - margin.left - margin.right,
+      height = 310 - margin.top - margin.bottom;
+
+
+  var svg = d3.select("#radarWrapper")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("id", 'radar')
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+}
+
+
+
+          
+              
 
     
 
-
-
-    // var data = [4, 8, 15, 16, 23, 42, 34, 39, 22, 3];
-    // sorting
-    // data.sort(function(a, b){return b-a});
-
-    
-    // var x = d3.scale.linear()
-    //     .domain([0, d3.max(data)])
-    //     .range([0, width]);
-
-    
-
-    
-    
-    // var bar = g.selectAll('g')
-    //     .data(data)
-    //     .enter()
-    //     .append("g")
-    //     .attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
-
-    // bar.append("rect")
-    //     .attr("width", x)
-    //     .attr("height", barHeight - 4);
-
-    // bar.append("text")
-    //     .attr("x", function(d) { return x(d); })
-    //     .attr("y", barHeight / 2)
-    //     .attr("dy", ".35em")
-    //     .text(function(d) { return d; });
-  }

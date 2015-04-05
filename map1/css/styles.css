@@ -202,11 +202,17 @@ h6 {
 }
 
 #topChart rect {
-  fill: darkblue;
+  fill: black;
 }
 
-#topChart text {
+#topChart .name {
   fill: black;
   font: 10px sans-serif;
   text-anchor: end;
+}
+
+#topChart .label {
+	text-anchor: end;
+	font: 10px sans-serif;
+	fill:white;
 }
