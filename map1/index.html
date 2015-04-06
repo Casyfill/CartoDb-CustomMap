@@ -43,7 +43,7 @@
 
         <div id='block2' class='infoblock'>
           <div class="blockHeader">
-            <h3 id="cityName">г. Иваново, Ивановская область</h3>
+            <h3 id="cityName">г. Иваново</h3>
           </div> 
           <div id="cityMap">
           
@@ -103,10 +103,11 @@
     <script>
       
       function main() {
-        createMap('map','http://cityfish.cartodb.com/api/v2/viz/90eec28c-cd05-11e4-bf8e-0e018d66dc29/viz.json')
-        localMap('map2','http://cityfish.cartodb.com/api/v2/viz/90eec28c-cd05-11e4-bf8e-0e018d66dc29/viz.json')
-        // barChart()
-        // createMap('mapr','http://cityfish.cartodb.com/api/v2/viz/90eec28c-cd05-11e4-bf8e-0e018d66dc29/viz.json')
+        createMap('map','http://rilosmaps.cartodb.com/api/v2/viz/2f67e2ca-dbe0-11e4-b561-0e0c41326911/viz.json')
+        localMap('map2','http://rilosmaps.cartodb.com/api/v2/viz/de88a126-c1b5-11e4-a92a-0e0c41326911/viz.json', [56.965254, 40.976324, 11])
+
+        getData()
+
         
       }
       window.onload = main;

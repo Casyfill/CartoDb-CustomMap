@@ -1,6 +1,6 @@
 function clicker(id, c){
       if (c='Button'){
-        // console.log(id)
+        
         d3.selectAll('.buttonClicked').attr('class','button');
         d3.select('#'+id).attr('class', 'buttonClicked');
       } 
@@ -14,8 +14,8 @@ function createMap(mapId, mapLink){
             search: false,
             zoomControl: false,
             tiles_loader: false,
-            center_lat: 61.074157,
-            center_lon: 69.089105,
+            center_lat: 55,
+            center_lon: 58,
             zoom: 3
         })
         .done(function(vis, layers) {
@@ -30,17 +30,39 @@ function createMap(mapId, mapLink){
           // now, perform any operations you need
           // map.setZoom(3);
           // map.panTo([50.5, 30.5]);
+          // d3.selectAll(".content").on("click",function(){
+          //       var name =d3.select(this).select('.text').text()
+          //       // console.log(name)
+          //       d3.select('#cityName').text(name)})
+          
 
+          d3.selectAll(".content").on("click",function(d){
+            var links = {'Иваново': {'link':'http://rilosmaps.cartodb.com/api/v2/viz/83684e08-dc41-11e4-90bf-0e0c41326911/viz.json', 'coordinates':[56.965254, 40.976324, 11]},
+                                     'Екатеринбург':{'link':' http://rilosmaps.cartodb.com/api/v2/viz/1f0f8220-dc44-11e4-91eb-0e018d66dc29/viz.json' , 'coordinates':[56.852020, 60.582492,11]}, 
+                                     'Омск':{'link':'http://rilosmaps.cartodb.com/api/v2/viz/928d5fba-dc44-11e4-aa84-0e853d047bba/viz.json', 'coordinates':[54.968537, 73.369185,11]}};
+
+
+            console.log('onTitle at work!')
+            var name =d3.select(this).select('.text').text()
+            // console.log(links[name])
+            d3.select('#cityName').text('г. ' + name)
+            d3.select(map2.firstChild).remove()
+            localMap('map2',links[name]['link'],links[name]['coordinates'])
+
+          })
         })
         .error(function(err) {
           console.log(err);
         });
       }
+
+
 function test(){
   console.log('Heyyy')
 }
 
-function localMap(mapId, mapLink){
+
+function localMap(mapId, mapLink, lonlatzoom){
         cartodb.createVis(mapId, mapLink, {
             shareable: false,
             title: false,
@@ -48,9 +70,9 @@ function localMap(mapId, mapLink){
             search: false,
             zoomControl: false,
             tiles_loader: false,
-            center_lat: 61.074157,
-            center_lon: 69.089105,
-            zoom: 3
+            center_lat: lonlatzoom[0],
+            center_lon: lonlatzoom[1],
+            zoom: lonlatzoom[2]
         })
         .done(function(vis, layers) {
           layers[1].setInteraction(false);
@@ -60,10 +82,15 @@ function localMap(mapId, mapLink){
           // you can get the native map to work with it
           var map = vis.getNativeMap();
           // now, perform any operations you need
-          map.setZoom(3);
-          map.panTo([50.5, 30.5]);
+          // map.setZoom(3);
+          // map.panTo([50.5, 30.5]);
           
+          function minimizeLegend(){
+            // console.log('!>!')
+            // d3.selectAll('.cartodb-legend').attr('padding','10px')
+          }
 
+          minimizeLegend();
         })
         .error(function(err) {
           console.log(err);
@@ -75,8 +102,7 @@ function barChart(){
     var margin = {top: 30, right: 10, bottom: 30, left: 30};
 
     var width = 500 - margin.left - margin.right,
-        height = 262 - margin.top - margin.bottom,
-        barHeight = 20;
+        height = 262 - margin.top - margin.bottom;
 
     var svg = d3.select("#topChart")
         .append("svg")
@@ -103,17 +129,14 @@ function barChart(){
           gba_data = data.sort(function(a,b){return d3.descending(a.gba, b.gba)}).slice(0,10);
           gla_data = data.sort(function(a,b){return d3.descending(a.gla, b.gla)}).slice(0,10);
           
-          // gla_data.forEach(function(d){console.log(d.name + ' ' + d.gla)})
-
-          // var newA = data.sort(function(a,b){return d3.descending(a.pop, b.pop)})
-          //   .slice(0,10);
-          // console.log(newA)
+          
           
           var x = d3.scale.linear()
             .domain([0, d3.max(pop_data, function(d) { return d.pop })])
             .range([0, width-100]);
 
-
+          var barHeight = height/pop_data.length;
+          var realBarHeight = 25;
           var bar = g.selectAll('#basic g')
               .data(pop_data);
 
@@ -123,18 +146,18 @@ function barChart(){
 
           bar.append("rect")
               .attr("width", function(d){return x(d.pop)})
-              .attr("height", barHeight - 4);
+              .attr("height", realBarHeight);
 
           bar.append("text")
                 .attr("class","name")
                 .attr("x", -10)
-                .attr("y", (barHeight / 2 -6))
+                .attr("y", (realBarHeight / 2 -6))
                 .attr("dy", ".75em")
                 .text(function(d,i) { return (i+1) + '. ' + d.name; });
 
           bar.append("text")
-                .attr("x", function(d){return x(d.pop)-5})
-                .attr("y", (barHeight / 2 -6))
+                .attr("x", function(d){return x(d.pop)- 5})
+                .attr("y", (realBarHeight / 2 -6))
                 .attr("dy", ".75em")
                 .attr("class","label")
                 .text(function(d,i) { return d.pop });
@@ -146,8 +169,8 @@ function barChart(){
               .domain([0, d3.max(data, function(d) { return d[id] })])
               .range([0, width-100]);
 
-            console.log('   ' + id)
-            // data.forEach(function(d,i){console.log(i + ' ' + d.name + ' ' + d[id])})
+            // console.log(id)
+            
 
             // bar.exit()
             bar.data(data)
@@ -258,41 +281,7 @@ function radarChart(){
           .attr('cy', height/2 )
           .transition().delay(function (d,i){ return i * 15;})
           .attr('r', crad )
-  
 
-    // LABELS
-
-      // chart.append('text')
-      //   .attr('class','label')
-      //   .attr('x', width/2 +5 )
-      //   .attr('y', function(d){return y1(d.pop) -5} )
-      //   .text(function(d){return d.pop});
-
-      // chart.append('text')
-      //   .attr('class','label')
-      //   .attr('x', function(d){return x1(d.den) +5} )
-      //   .attr('y', height/2 - 5 )
-      //   .text(function(d){return d.den});
-
-      // chart.append('text')
-      //   .attr('class','label')
-      //   .attr('x',width/2 +5 )
-      //   .attr('y', function(d){return y2(d.gba) -5} )
-      //   .text(function(d){return d.gba});
-
-      // chart.append('text')
-      //   .attr('class','label')
-      //   .attr('x', function(d){return x2(d.gla) +5} )
-      //   .attr('y', height/2 -5 )
-      //   .text(function(d){return d.gla});
-
-
-
-    
-
-
-    // console.log(x2);
-    // var scl = d3.scale.linear().domain([0, 100]).range([0, 100]);
     var x1Axis = d3.svg.axis().scale(x1).ticks(3).orient("bottom");
     var x2Axis = d3.svg.axis().scale(x2).ticks(3).orient("bottom");
     var y1Axis = d3.svg.axis().scale(y1).ticks(3).orient("right");
@@ -377,14 +366,21 @@ function radarChart(){
       .attr("transform", "translate(" + (width-10) + "," + height/2 + ")")
       .attr('class','name')
       .text('GBA')
-
-
-      // for(var pti=0;pti<4;pti++){
-
-      // }
-                //.attr('points', function(d){return [y1(d.pop),x1(d.den),y2(d.gba),x2(d.gla)]})
-
 }
+
+function getData(){
+       // UpdateRadar
+       // console.log('la!')
+      var sql = new cartodb.SQL({ user: 'rilos' });
+      
+      sql.execute("SELECT * FROM topdatum ")
+        .done(function(data) {
+                console.log('!' + data.rows);
+            })
+          
+}
+      
+              
 
 
 

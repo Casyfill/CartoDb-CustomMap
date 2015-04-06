@@ -209,7 +209,7 @@ h6 {
 }
 
 #topChart rect {
-  fill: black;
+  fill: rgb(35,59,96);
 }
 
 #topChart .name {
