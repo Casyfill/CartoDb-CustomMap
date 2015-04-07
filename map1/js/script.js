@@ -151,8 +151,13 @@ function localMap(mapId, mapLink, lonlatzoom){
           // map.panTo([50.5, 30.5]);
           
           function minimizeLegend(){
-            // console.log('!>!')
-            // d3.selectAll('.cartodb-legend').attr('padding','10px')
+            
+            var box = d3.selectAll('.cartodb-legend-stack').style('bottom','246px').style('right','5px')
+            box.select('.cartodb-legend').style('padding','6px').style('padding-bottom','0px')
+            box.select('.legend-title').style('margin-bottom','0px')
+
+            d3.select('.cartodb-zoom').style('margin-top','5px').style('margin-left','5px')
+            
           }
 
           minimizeLegend();
