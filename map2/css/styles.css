@@ -106,7 +106,7 @@ h3 {
 
 #chartContainer {
 	display: inline-block;
-	width: 74%;
+	min-width: 74%;
 	height: 262px;
 
 	background-color: rgb(227,229,226);
@@ -226,15 +226,15 @@ h6 {
 
 #radar polygon {
 	/*fill:none;*/
-	fill:rgb(35,59,96);
+	fill:lime;
 	fill-opacity:0.1;
-	stroke:rgb(35,59,96);
+	stroke:lime;
 	stroke-width:2px;
 }
 
 #radar circle {
 	
-	fill: rgb(35,59,96);
+	fill:lime;
 }
 
 #radar .label {

@@ -107,10 +107,20 @@ function barChart(){
     var svg = d3.select("#topChart")
         .append("svg")
         .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
+        .attr("height", height + margin.top + margin.bottom);
+        
+    svg.append("g")
         .attr("id", 'basic')
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+    svg.append('g')
+       .attr('id','quantG')
+       .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+       .append('text')
+       .attr('id','quant')
+       .attr("transform", "translate(" + (width) + "," + (height-4) + ")")
+       .text('Население, тыс. чел.')
+
 
     var g = d3.select("#basic")
 
@@ -135,8 +145,9 @@ function barChart(){
             .domain([0, d3.max(pop_data, function(d) { return d.pop })])
             .range([0, width-100]);
 
-          var barHeight = height/pop_data.length;
-          var realBarHeight = 25;
+          // var barHeight = height/pop_data.length;
+          var barHeight = 25;
+          var realBarHeight = barHeight;
           var bar = g.selectAll('#basic g')
               .data(pop_data);
 
@@ -146,12 +157,12 @@ function barChart(){
 
           bar.append("rect")
               .attr("width", function(d){return x(d.pop)})
-              .attr("height", realBarHeight);
+              .attr("height", realBarHeight-4);
 
           bar.append("text")
                 .attr("class","name")
                 .attr("x", -10)
-                .attr("y", (realBarHeight / 2 -6))
+                .attr("y", barHeight/2-6)
                 .attr("dy", ".75em")
                 .text(function(d,i) { return (i+1) + '. ' + d.name; });
 
@@ -186,6 +197,10 @@ function barChart(){
               .transition().delay(function (d,i){ return i * 15;})
               .attr("x", function(d){return x(d[id])-5})
               .text(function(d,i) { return d[id] });
+
+            var quantDict = {'pop':'Население, тыс. ч.','den':'Арендуемые плотность, кв. м. на тыс. жителей', 'gla':'Торговые площади, кв. м.','gba':'Количество торговых центров'};
+
+            d3.select('#quant').text(quantDict[id])
 
             
           }
@@ -369,14 +384,16 @@ function radarChart(){
 }
 
 function getData(){
-       // UpdateRadar
-       // console.log('la!')
-      var sql = new cartodb.SQL({ user: 'rilos' });
-      
-      sql.execute("SELECT * FROM topdatum ")
+    
+    var sql = new cartodb.SQL({ user: 'rilos', format: 'geojson', dp: 5});
+    sql.execute("SELECT * FROM topdatum")
         .done(function(data) {
-                console.log('!' + data.rows);
-            })
+        console.log(data.rows);
+        })
+        .error(function(errors) {
+        // errors contains a list of errors
+        console.log("errors:" + errors);
+        })
           
 }
       

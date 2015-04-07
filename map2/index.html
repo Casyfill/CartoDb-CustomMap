@@ -1,78 +1,117 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+  
   <head>
-    <title>Moscow Rayons</title>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-    <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
-    <style>
+  <meta charset="utf-8">
+  <title>Анализ рынка коммерческой недвижимости, 2015 г.</title>
+  <link rel="shortcut icon" href="img/favicons.png" />
+  <script src="js/d3.v3.js"></script>
+  <script src="js/script.js"></script>
+  <script src="http://libs.cartocdn.com/cartodb.js/v3/3.12/cartodb.js"></script>
+
+
+  <link href="css/styles.css" type="text/css" rel="stylesheet"/>
+  <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.12/themes/css/cartodb.css" />
+  <style>
       html, body, #map {
         height: 100%;
         padding: 0;
         margin: 0;
       }
-
     </style>
-
-    <link rel="stylesheet" href="http://libs.cartodb.com/cartodb.js/v3/3.12/themes/css/cartodb.css" />
   </head>
-  <body>
-    <div id="map"></div>
+  
+    <body>
+      <div id='wrapper' >
+        <div id='header'>
+          <div id='titles' display:inline-block;>
+            <h1>Анализ рынка коммерческой недвижимости, 2015 г.</h1>
+            <text id='subtitle'>Выберите город на карте для просмотра  характеристик коммерческой недвижимости</text>
+          </div>
+          <div id="logo" display:inline-block;>
+            <img src="img/logo.png" alt="Rilos"  width="100%" align='right'>
+          </div>
+        </div>
 
-    <script type="infowindow/html" id="infowindow_template">
-    </script>
 
-    <!-- карта -->
-    <script src="http://libs.cartodb.com/cartodb.js/v3/3.11/cartodb.js"></script>
-    <!-- графики -->
-     <script type="text/javascript"
-          src="https://www.google.com/jsapi?autoload={
-            'modules':[{
-              'name':'visualization',
-              'version':'1',
-              'packages':['corechart']
-            }]
-          }"></script>
-    <!-- <script type="text/javascript" src="d3.v2.min.js"></script> -->
+
+        <div id='block1' class='infoblock'>
+          <div id="map"></div>
+          
+        </div>	
+
+
+        <div id='block2' class='infoblock'>
+          <div class="blockHeader">
+            <h3 id="cityName">г. Иваново</h3>
+          </div> 
+          <div id="cityMap">
+          
+            <div id="map2"></div>
+          </div>
+          <div id="radarWrapper">
+           <script>radarChart()</script> 
+
+          </div>
+        </div> 
+        
+
+        <div id='block3' class='infoblock'>
+          <div class="blockHeader">
+            <h3 id="cityName">
+              ТОП-10 городов
+            </h3>
+          </div> 
+          
+          <div id="chartContainer">  
+            <div id="topChart">
+              <script>
+                barChart()
+              </script>
+            </div>  
+
+          </div>
+          <div id="chartMenu">
+            <div id='menuAligner'>
+              <div class='buttonClicked' id='pop' onclick="clicker(this.id, this.class)">
+                <p class="inbutton">Население</p>
+              </div>
+              <div class='button' id='den' onclick="clicker(this.id, this.class)">
+                <p class="inbutton">Коммерческая плотность</p>
+              </div>
+              <div class='button' id='gba' onclick="clicker(this.id, this.class)">
+              <p class="inbutton">GBA</p></div>
+              <div class='button' id='gla' onclick="clicker(this.id, this.class)" >
+              <p class="inbutton">GLA</p></div>
+            </div>
+            
+            
+          </div>
+
+        </div>
+
+
+        <div id='footer' class='infoblock'>
+          <h6>
+            Свяжитесь с нами для получения более подробной информации о наших продуктах и услугах
+          </h6>
+          <p id='contacts'>web-site: <a href='http://www.rilos.ru'>www.rilos.ru</a> | E-mail: <a href="mailto:info@rilos.ru">info@rilos.ru</a> | Tel: +7 499 638 24 14</p>
+        </div> 
+
+    </div>
 
     <script>
-
-      // load visualization library from google
-      google.load('visualization', '1.0', {'packages':['corechart']});
       
       function main() {
-        // create map
-        var map = L.map('map', { 
-          zoomControl: false,
-          center: [56.066460,67.651344],
-          zoom: 6,
-          infowindow:true,
-          scrollwheel:false
-        });
-        // add a nice baselayer from Cartodb
-        L.tileLayer('https://cartocdn_{s}.global.ssl.fastly.net/base-midnight/{z}/{x}/{y}.png', {
-          attribution: 'CartoDB'
-        }).addTo(map);
+        createMap('map','http://rilosmaps.cartodb.com/api/v2/viz/2f67e2ca-dbe0-11e4-b561-0e0c41326911/viz.json')
+        localMap('map2','http://rilosmaps.cartodb.com/api/v2/viz/de88a126-c1b5-11e4-a92a-0e0c41326911/viz.json', [56.965254, 40.976324, 11])
+
+        getData()
 
         
-        cartodb.createLayer(map, 'http://cityfish.cartodb.com/api/v2/viz/90eec28c-cd05-11e4-bf8e-0e018d66dc29/viz.json')
-         .addTo(map)
-         .on('done', function(layer) {
-            // get sublayer 0 and set the infowindow template
-            var sublayer = layer.getSubLayer(1);
-            sublayer.infowindow.set({
-              // width:      600,
-              // height:  600
-            });
-
-
-          }).on('error', function() {
-            console.log("some error occurred");
-          });
       }
-
-        
       window.onload = main;
     </script>
+
   </body>
 </html>

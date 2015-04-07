@@ -50,7 +50,7 @@
             <div id="map2"></div>
           </div>
           <div id="radarWrapper">
-           <script>radarChart()</script> 
+           <!-- <script>radarChart()</script>  -->
 
           </div>
         </div> 
@@ -65,9 +65,9 @@
           
           <div id="chartContainer">  
             <div id="topChart">
-              <script>
+              <!-- <script>
                 barChart()
-              </script>
+              </script> -->
             </div>  
 
           </div>
@@ -103,12 +103,8 @@
     <script>
       
       function main() {
-        createMap('map','http://rilosmaps.cartodb.com/api/v2/viz/2f67e2ca-dbe0-11e4-b561-0e0c41326911/viz.json')
-        localMap('map2','http://rilosmaps.cartodb.com/api/v2/viz/de88a126-c1b5-11e4-a92a-0e0c41326911/viz.json', [56.965254, 40.976324, 11])
-
+    
         getData()
-
-        
       }
       window.onload = main;
     </script>
