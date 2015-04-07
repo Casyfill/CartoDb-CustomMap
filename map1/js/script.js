@@ -1,3 +1,24 @@
+
+// var localFormatter = localise()
+var ru = d3.locale({
+  "decimal": ",",
+  "thousands": "\xa0",
+  "grouping": [3],
+  "currency": ["", " руб."],
+  "dateTime": "%A, %e %B %Y г. %X",
+  "date": "%d.%m.%Y",
+  "time": "%H:%M:%S",
+  "periods": ["AM", "PM"],
+  "days": ["воскресенье", "понедельник", "вторник", "среда", "четверг", "пятница", "суббота"],
+  "shortDays": ["вс", "пн", "вт", "ср", "чт", "пт", "сб"],
+  "months": ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"],
+  "shortMonths": ["янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"]
+});
+d3.format = ru.numberFormat;
+myFormatter = ru.numberFormat(',.0f')
+
+
+
 function clicker(obj){
       console.log(obj)
       if (obj.class='Button'){
@@ -77,7 +98,7 @@ function createMap(mapId, mapLink){
                                 return str;
                           }
 
-                      console.log(sample)
+                      // console.log(sample)
                       
                       area.select('polygon')
                           .transition().delay(30)
@@ -115,7 +136,8 @@ function localMap(mapId, mapLink, lonlatzoom){
             center_lat: lonlatzoom[0],
             center_lon: lonlatzoom[1],
             zoom: lonlatzoom[2],
-            scrollwheel:true
+            scrollwheel:true,
+            infowindow:true
         })
         .done(function(vis, layers) {
           layers[1].setInteraction(false);
@@ -209,7 +231,7 @@ function barChart(datum){
                 .attr("y", (realBarHeight / 2 -6))
                 .attr("dy", ".75em")
                 .attr("class","label")
-                .text(function(d,i) { return d.pop });
+                .text(function(d,i) { return window.myFormatter(d.pop) });
 
 
 
@@ -234,9 +256,9 @@ function barChart(datum){
             bar.select('text.label')
               .transition().delay(function (d,i){ return i * 15;})
               .attr("x", function(d){return x(d[id])-5})
-              .text(function(d,i) { return d[id] });
+              .text(function(d,i) { return window.myFormatter(d[id]) });
 
-            var quantDict = {'pop':'Население, тыс. ч.','den':'Арендуемые плотность, кв. м. на тыс. жителей', 'gla':'Торговые площади, кв. м.','count':'Количество торговых центров'};
+            var quantDict = {'pop':'Население, тыс. ч.','den':'Коммерческая плотность, кв. м. на тыс. жителей', 'gla':'Арендуемая площадь, кв. м.','count':'Количество торговых центров'};
 
             d3.select('#quant').text(quantDict[id])
 
@@ -292,7 +314,7 @@ function radarChart(datum){
       max_den = d3.max(datum.map(function(d){ return d.den})),
       max_gba = d3.max(datum.map(function(d){ return d.count})),
       max_gla = d3.max(datum.map(function(d){ return d.gla}));
-  console.log([max_pop,max_den,max_gba,max_gla]);
+  // console.log([max_pop,max_den,max_gba,max_gla]);
 
   //axis direction 
   // -y1-
@@ -357,10 +379,10 @@ function radarChart(datum){
           .transition().delay(function (d,i){ return i * 15;})
           .attr('r', crad )
 
-    var x1Axis = d3.svg.axis().scale(x1).ticks(1).orient("bottom");
-    var x2Axis = d3.svg.axis().scale(x2).ticks(1).orient("bottom");
-    var y1Axis = d3.svg.axis().scale(y1).ticks(1).orient("right");
-    var y2Axis = d3.svg.axis().scale(y2).ticks(1).orient("right");
+    var x1Axis = d3.svg.axis().scale(x1).ticks(1).orient("bottom").tickValues([max_den]).tickFormat(window.myFormatter);
+    var x2Axis = d3.svg.axis().scale(x2).ticks(1).orient("bottom").tickValues([max_gla]).tickFormat(window.myFormatter);
+    var y1Axis = d3.svg.axis().scale(y1).ticks(1).orient("right").tickValues([max_pop]).tickFormat(window.myFormatter);
+    var y2Axis = d3.svg.axis().scale(y2).ticks(1).orient("right").tickValues([max_gba]).tickFormat(window.myFormatter);
 
     
 
@@ -456,6 +478,7 @@ function radarChart(datum){
 
 
 function getData(){
+  
     
         
     d3.json("http://philip.cartodb.com/api/v2/sql?q=SELECT * FROM topdatum WHERE status IS true &format=geojson&dp=5",  function(error, d){

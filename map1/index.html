@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <title>Анализ рынка коммерческой недвижимости, 2015 г.</title>
   <link rel="shortcut icon" href="img/favicons.png" />
-  <script src="js/d3.v3.js"></script>
+  <script src="js/d3.js"></script>
   <script src="js/script.js"></script>
   <script src="http://libs.cartocdn.com/cartodb.js/v3/3.12/cartodb.js"></script>
 
@@ -24,12 +24,15 @@
     <body>
       <div id='wrapper' >
         <div id='header'>
+          <div id="head">
           <div id='titles' display:inline-block;>
-            <h1>Анализ рынка коммерческой недвижимости, 2015 г.</h1>
-            <text id='subtitle'>Выберите город на карте для просмотра  характеристик коммерческой недвижимости</text>
+            <h1>Анализ рынка коммерческой недвижимости, 2015 г.</h1> 
           </div>
           <div id="logo" display:inline-block;>
             <img src="img/logo.png" alt="Rilos"  width="100%" align='right'>
+          </div>
+          </div>
+          <div id='sub'>Выберите город на карте для просмотра  характеристик коммерческой недвижимости
           </div>
         </div>
 
@@ -59,7 +62,7 @@
         <div id='block3' class='infoblock'>
           <div class="blockHeader">
             <h3 id="cityName">
-              ТОП-10 городов
+              ТОП Городов
             </h3>
           </div> 
           
@@ -80,7 +83,7 @@
                 <p class="inbutton">Коммерческая плотность</p>
               </div>
               <div class='button' id='gba' onclick="clicker(this)">
-              <p class="inbutton">GBA</p></div>
+              <p class="inbutton">Торговые Центры</p></div>
               <div class='button' id='gla' onclick="clicker(this)" >
               <p class="inbutton">GLA</p></div>
             </div>
