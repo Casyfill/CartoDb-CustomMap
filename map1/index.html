@@ -73,15 +73,15 @@
           </div>
           <div id="chartMenu">
             <div id='menuAligner'>
-              <div class='buttonClicked' id='pop' onclick="clicker(this.id, this.class)">
+              <div class='buttonClicked' id='pop' onclick="clicker(this)">
                 <p class="inbutton">Население</p>
               </div>
-              <div class='button' id='den' onclick="clicker(this.id, this.class)">
+              <div class='button' id='den' onclick="clicker(this)">
                 <p class="inbutton">Коммерческая плотность</p>
               </div>
-              <div class='button' id='gba' onclick="clicker(this.id, this.class)">
+              <div class='button' id='gba' onclick="clicker(this)">
               <p class="inbutton">GBA</p></div>
-              <div class='button' id='gla' onclick="clicker(this.id, this.class)" >
+              <div class='button' id='gla' onclick="clicker(this)" >
               <p class="inbutton">GLA</p></div>
             </div>
             
@@ -103,7 +103,7 @@
     <script>
       
       function main() {
-    
+
         getData()
       }
       window.onload = main;
