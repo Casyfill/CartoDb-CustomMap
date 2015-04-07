@@ -110,11 +110,12 @@ function localMap(mapId, mapLink, lonlatzoom){
             title: false,
             description: false,
             search: false,
-            zoomControl: false,
+            zoomControl: true,
             tiles_loader: false,
             center_lat: lonlatzoom[0],
             center_lon: lonlatzoom[1],
-            zoom: lonlatzoom[2]
+            zoom: lonlatzoom[2],
+            scrollwheel:true
         })
         .done(function(vis, layers) {
           layers[1].setInteraction(false);
