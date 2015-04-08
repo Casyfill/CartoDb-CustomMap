@@ -24,70 +24,89 @@
     <body>
       <div id='wrapper' >
         <div id='header'>
+          <div id="head">
           <div id='titles' display:inline-block;>
-            <h1>Анализ рынка коммерческой недвижимости, 2015 г.</h1>
-            <text id='subtitle'>Выберите город на карте для просмотра  характеристик коммерческой недвижимости</text>
+            <h1>Анализ рынка коммерческой недвижимости, 2015 г.</h1> 
           </div>
           <div id="logo" display:inline-block;>
-            <img src="img/logo.png" alt="Rilos"  width="100%" align='right'>
+            <img src="img/logo.png" alt="Rilos"  width="98%" align='right'>
+            <img src="img/logo2.png" alt="ИдиНайди"  width="100%" align='right'>
+          </div>
+
+          </div>
+          <div id='sub'>Выберите район на карте для просмотра  характеристик коммерческой недвижимости
           </div>
         </div>
 
 
 
-        <div id='block1' class='infoblock'>
-          <div id="map"></div>
+        <div id='block1' class='tableblock'>
+          <table class='info'>
+            <tr>
+              <th>г. Москва</th>
+              <th>Ломоносовский район</th>
+            </tr>
+            
+            <tr>
+              <td class='content'>citymap</td>
+              <td class='content'>rayonmap </td>
+            </tr>
+          </table>
+
           
         </div>	
 
 
-        <div id='block2' class='infoblock'>
-          <div class="blockHeader">
-            <h3 id="cityName">г. Иваново</h3>
-          </div> 
-          <div id="cityMap">
+   
+        <div id='block2' class='tableblock'>
+          <table class='info'>
+            <tr>
+              <th>Социально-демографический анализ, 2002-2014 гг.
+              </th>
+              <th>Сравнительный анализ, Ломоносовский район
+              </th>
+            </tr>
+            
+            <tr>
+              <td class='content'>graph1</td>
+              <td class='content'>graph2</td>
+            </tr>
+          </table>
           
-            <div id="map2"></div>
-          </div>
-          <div id="radarWrapper">
-           <script>radarChart()</script> 
-
-          </div>
-        </div> 
+          
+        </div>  
         
 
         <div id='block3' class='infoblock'>
           <div class="blockHeader">
             <h3 id="cityName">
-              ТОП-10 городов
+              ТОП лучших районов
             </h3>
           </div> 
           
           <div id="chartContainer">  
             <div id="topChart">
-              <script>
+              <!-- <script>
                 barChart()
-              </script>
+              </script> -->
             </div>  
 
           </div>
           <div id="chartMenu">
             <div id='menuAligner'>
-              <div class='buttonClicked' id='pop' onclick="clicker(this.id, this.class)">
+              <div class='buttonClicked' id='pop' onclick="clicker(this)">
                 <p class="inbutton">Население</p>
               </div>
-              <div class='button' id='den' onclick="clicker(this.id, this.class)">
-                <p class="inbutton">Коммерческая плотность</p>
+              <div class='button' id='den' onclick="clicker(this)">
+                <p class="inbutton">Плотность</p>
               </div>
-              <div class='button' id='gba' onclick="clicker(this.id, this.class)">
-              <p class="inbutton">GBA</p></div>
-              <div class='button' id='gla' onclick="clicker(this.id, this.class)" >
-              <p class="inbutton">GLA</p></div>
-            </div>
-            
+              <div class='button' id='gba' onclick="clicker(this)">
+              <p class="inbutton">Средний доход</p></div>
+              
             
           </div>
 
+        </div>
         </div>
 
 
@@ -103,12 +122,8 @@
     <script>
       
       function main() {
-        createMap('map','http://rilosmaps.cartodb.com/api/v2/viz/2f67e2ca-dbe0-11e4-b561-0e0c41326911/viz.json')
-        localMap('map2','http://rilosmaps.cartodb.com/api/v2/viz/de88a126-c1b5-11e4-a92a-0e0c41326911/viz.json', [56.965254, 40.976324, 11])
 
-        getData()
-
-        
+       
       }
       window.onload = main;
     </script>

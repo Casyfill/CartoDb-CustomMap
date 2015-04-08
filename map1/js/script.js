@@ -45,10 +45,10 @@ function createMap(mapId, mapLink){
           
 
           d3.selectAll(".content").on("click",function(d){
-            var links = {'Иваново': {'link':'http://rilosmaps.cartodb.com/api/v2/viz/83684e08-dc41-11e4-90bf-0e0c41326911/viz.json', 'coordinates':[56.965254, 40.976324, 11]},
-                                     'Екатеринбург':{'link':' http://rilosmaps.cartodb.com/api/v2/viz/1f0f8220-dc44-11e4-91eb-0e018d66dc29/viz.json' , 'coordinates':[56.852020, 60.582492,11]}, 
-                                     'Омск':{'link':'http://rilosmaps.cartodb.com/api/v2/viz/928d5fba-dc44-11e4-aa84-0e853d047bba/viz.json', 'coordinates':[54.968537, 73.369185,11]}};
+            var links = {'Иваново': {'link':'http://rilosmaps.cartodb.com/api/v2/viz/83684e08-dc41-11e4-90bf-0e0c41326911/viz.json', 'coordinates':[57.001333, 41.011776, 11]},
 
+                                     'Екатеринбург':{'link':' http://rilosmaps.cartodb.com/api/v2/viz/1f0f8220-dc44-11e4-91eb-0e018d66dc29/viz.json' , 'coordinates':[56.85719, 60.611731,10]}, 
+                                     'Омск':{'link':'http://rilosmaps.cartodb.com/api/v2/viz/928d5fba-dc44-11e4-aa84-0e853d047bba/viz.json', 'coordinates':[54.968537, 73.369185,10]}};
 
             console.log('onTitle at work!')
             var name =d3.select(this).select('.text').text()
