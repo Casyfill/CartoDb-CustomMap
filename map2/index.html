@@ -94,13 +94,13 @@
           </div>
           <div id="chartMenu">
             <div id='menuAligner'>
-              <div class='buttonClicked' id='pop' onclick="clicker(this)">
+              <div class='buttonClicked' id='pop_2014' onclick="clicker(this.id, this.class)">
                 <p class="inbutton">Население</p>
               </div>
-              <div class='button' id='den' onclick="clicker(this)">
+              <div class='button' id='den' onclick="clicker(this.id, this.class)">
                 <p class="inbutton">Плотность</p>
               </div>
-              <div class='button' id='gba' onclick="clicker(this)">
+              <div class='button' id='sal_2014' onclick="clicker(this.id, this.class)">
               <p class="inbutton">Средний доход</p></div>
               
             
@@ -122,7 +122,7 @@
     <script>
       
       function main() {
-
+        getData();
        
       }
       window.onload = main;

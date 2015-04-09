@@ -169,6 +169,7 @@ h3 {
 	min-height: 35px;
 	font-size: 0.9em;
 	background-color: white;
+	cursor: pointer;
 
 }
 
@@ -187,7 +188,8 @@ h3 {
 	width:150px;
 	min-height: 35px;
 	font-size: 0.9em;
-	background-color: rgb(227,229,226) 	
+	background-color: rgb(227,229,226);
+	cursor:pointer; 	
 
 }
 
