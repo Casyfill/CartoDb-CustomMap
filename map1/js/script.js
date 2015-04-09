@@ -488,7 +488,7 @@ function getData(){
         
     d3.json("http://philip.cartodb.com/api/v2/sql?q=SELECT * FROM topdatum WHERE status IS true &format=geojson&dp=5",  function(error, d){
       dataset = d.features.map(function(d){return d.properties})
-      createMap('map','http://rilosmaps.cartodb.com/api/v2/viz/2f67e2ca-dbe0-11e4-b561-0e0c41326911/viz.json')    
+      createMap('map','https://rilosmaps.cartodb.com/u/philip/api/v2/viz/67bc4abe-de86-11e4-9832-0e0c41326911/viz.json')    
   
       localMap('map2','http://rilosmaps.cartodb.com/api/v2/viz/de88a126-c1b5-11e4-a92a-0e0c41326911/viz.json', [56.965254, 40.976324, 11])
       barChart(dataset)
