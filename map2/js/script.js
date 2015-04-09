@@ -56,7 +56,7 @@ function barChart(datum){
 
 
           pop_data = data.sort(function(a,b){return d3.descending(a.pop_2014, b.pop_2014)}).slice(0,5);
-          den_data = data.sort(function(a,b){return d3.descending(a.den, b.den)}).slice(0,5);
+          den_data = data.sort(function(a,b){return d3.descending(a.dencity, b.dencity)}).slice(0,5);
           sal_data = data.sort(function(a,b){return d3.descending(a.salary_2014, b.salary_2014)}).slice(0,5);
           
           console.log(pop_data);
@@ -125,9 +125,11 @@ function barChart(datum){
           
           
           d3.select('#pop').on('click', function(d){updateBars('pop_2014',bar, pop_data)});
-          d3.select('#sal').on('click', function(d){updateBars('sal_2014',bar, sal_data)});
-          d3.select('#den').on('click', function(d){updateBars('den_2014',bar, den_data)});
+          d3.select('#sal').on('click', function(d){updateBars('salary_2014',bar, sal_data)});
+          d3.select('#den').on('click', function(d){updateBars('dencity',bar, den_data)});
           
+          
+                    
 
 
       // })
