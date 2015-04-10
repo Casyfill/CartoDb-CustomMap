@@ -104,7 +104,7 @@ h3 {
 	height: 100%;
 	border-right: 1px solid #a1a1a1;
 }
-#map2 {
+.contentDiv {
 	height: 100%;
 }
 
@@ -193,6 +193,17 @@ h3 {
 
 }
 
+
+p.inbutton {
+   display: table-cell;
+  text-align: center; 
+	margin: auto;
+	line-height: 90%;
+	vertical-align: middle;
+	/*position: relative;
+	top:13px*/;
+}
+
 /*
 .buttonClicked:hover {
 	background-color: #AAABAE; 	
@@ -216,18 +227,13 @@ table.info  {
 
 .info td{
 	width: 50%;
-	height: calc(100%-36px);
+	height: 308;
 }
 
-p.inbutton {
-   display: table-cell;
-  text-align: center; 
-	margin: auto;
-	line-height: 90%;
-	vertical-align: middle;
-	/*position: relative;
-	top:13px*/;
+#map2 {
+	height: 100%;
 }
+
 
 /*FOOTER*/
 #footer{
@@ -269,25 +275,6 @@ h6 {
 	fill:white;
 }
 
-#radar polygon {
-	/*fill:none;*/
-	fill:rgb(35,59,96);
-	fill-opacity:0.1;
-	stroke:rgb(35,59,96);
-	stroke-width:2px;
-}
-
-#radar circle {
-	
-	fill: rgb(35,59,96);
-}
-
-#radar .label {
-	text-anchor: start;
-	font: 11px sans-serif;
-	fill:black;
-	
-}
 
 .axis .name{
 	text-anchor: start;
