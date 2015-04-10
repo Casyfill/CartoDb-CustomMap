@@ -31,7 +31,7 @@ function barChart(datum){
     var margin = {top: 30, right: 10, bottom: 30, left: 30};
 
     var width = 500 - margin.left - margin.right,
-        height = 262 - margin.top - margin.bottom;
+        height = 212 - margin.top - margin.bottom;
 
     var svg = d3.select("#topChart")
         .append("svg")
@@ -116,7 +116,7 @@ function barChart(datum){
               .attr("x", function(d){return x(d[id])-5})
               .text(function(d,i) { return window.myFormatter(d[id]) });
 
-            var quantDict = {'pop_2014':'Население, тыс. ч.','den_2014':'Коммерческая плотность, кв. м. на тыс. жителей', 'sal_2014':'Средняя зарплата, руб.'};
+            var quantDict = {'pop_2014':'Население, тыс. ч.','dencity':'Плотность, количество человек на кв. км.', 'salary_2014':'Средняя зарплата, руб.'};
 
             d3.select('#quant').text(quantDict[id])
 
