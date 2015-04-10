@@ -17,7 +17,8 @@ var ru = d3.locale({
 d3.format = ru.numberFormat;
 myFormatter = ru.numberFormat(',.0f')
 
-
+var radarLookup = {};
+var radarAxises = {'x1':{},'x2':{},'y1':{},'y2':{}};
 
 function clicker(obj){
       console.log(obj)
@@ -47,7 +48,7 @@ function createMap(mapId, mapLink){
           
           
 
-          d3.selectAll(".content").on("click",function(d){
+          d3.selectAll("#map .content").on("click",function(d){
             var links = {'Иваново': {'link':'http://rilosmaps.cartodb.com/api/v2/viz/83684e08-dc41-11e4-90bf-0e0c41326911/viz.json', 'coordinates':[57.001333, 41.011776, 11]},
 
                                      'Екатеринбург':{'link':' http://rilosmaps.cartodb.com/api/v2/viz/1f0f8220-dc44-11e4-91eb-0e018d66dc29/viz.json' , 'coordinates':[56.85719, 60.611731,10]}, 
@@ -66,54 +67,42 @@ function createMap(mapId, mapLink){
                     d3.json("http://philip.cartodb.com/api/v2/sql?q=SELECT * FROM topdatum WHERE status IS true &format=geojson&dp=5",  function(error, d){
                     datum = d.features.map(function(d){return d.properties})
 
-                    function Look(d){
-                      var lookup = {};
-                      for (var i = 0, len = d.length; i < len; i++) {
-                          lookup[d[i].cityname] = d[i];
-                        }
-                      return lookup
-                      }
-
                     
-                    var sample = Look(datum)[name]
+                    var sample = window.radarLookup[name]
 
-                    var max_pop = d3.max(datum.map(function(d){ return d.pop})),
-                        max_den = d3.max(datum.map(function(d){ return d.den})),
-                        max_gba = d3.max(datum.map(function(d){ return d.count})),
-                        max_gla = d3.max(datum.map(function(d){ return d.gla}));
-
-                        //axis direction 
-                        // -y1-
-                        // x2-x1
-                        // -y2-
-                        var width=278, height=230;
-                        var y1 = d3.scale.linear().domain([0, max_pop]).range([height/2,0]);
-                        var x1 = d3.scale.linear().domain([0, max_den]).range([width/2, width/2 +height/2]);
-                        var y2 = d3.scale.linear().domain([0, max_gba]).range([height/2, height ]);
-                        var x2 = d3.scale.linear().domain([0, max_gla]).range([width/2,width/2-height/2]);
-
+        
+                    var y1 = window.radarAxises['y1'];
+                    var y2 = window.radarAxises['y2'];
+                    var x1 = window.radarAxises['x1'];
+                    var x2 = window.radarAxises['x2'];
+                    var width=278, height=230;
                         
-                        function convertCoord(d){
+                    function convertCoord(d){
                           var str="";
                             for(var pti=0;pti<d.length;pti++){
                                 str=str+d[pti][0]+","+d[pti][1]+" ";
                                 }
                                 return str;
-                          }
+                    }
 
                       // console.log(sample)
                       
-                      area.select('polygon')
-                          .transition().delay(30)
-                          .attr('points',function(d){return convertCoord([[width/2, y1(sample.pop)],[x1(sample.den),height/2],[width/2, y2(sample.count)],[x2(sample.gla),height/2]])} )
+                    area.select('polygon')
+                        .transition().delay(30)
+                        .attr('points',function(d){return convertCoord([[width/2, y1(sample.pop)],[x1(sample.den),height/2],[width/2, y2(sample.count)],[x2(sample.gla),height/2]])} )
 
-                      // circles = area.selectAll('circle')
                                     
+                      // move circles
+                    area.select('#pop').transition().delay(30).attr('cy', y1(sample.pop) )
+                    area.select('#den').transition().delay(30).attr('cx', x1(sample.den) )
+                    area.select('#gla').transition().delay(30).attr('cx', x2(sample.gla) )
+                    area.select('#count').transition().delay(30).attr('cy', y2(sample.count) )
 
-                      area.select('#pop').transition().delay(30).attr('cy', y1(sample.pop) )
-                      area.select('#den').transition().delay(30).attr('cx', x1(sample.den) )
-                      area.select('#gla').transition().delay(30).attr('cx', x2(sample.gla) )
-                      area.select('#count').transition().delay(30).attr('cy', y2(sample.count) )
+                    // console.log(area.select('#popLabel'))
+                    area.select('#popLabel').text(function(){return window.myFormatter(sample.pop)}).transition().delay(30).attr('y', y1(sample.pop)-5 )
+                    area.select('#denLabel').text(function(){return window.myFormatter(sample.den)}).transition().delay(30).attr('x', x1(sample.den)+5 )
+                    area.select('#glaLabel').text(function(){return window.myFormatter(sample.gla)}).transition().delay(30).attr('x', x2(sample.gla)-5 )
+                    area.select('#countLabel').text(function(){return window.myFormatter(sample.count)}).transition().delay(30).attr('y', y2(sample.count)-5 )
 
 
                     });
@@ -298,11 +287,7 @@ function radarChart(datum){
       .append("g")
       .attr("id", 'radar')
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-      
-
- 
-    
+   
   // lookap - создаем словарь объектов по имени
   function Look(d){
   var lookup = {};
@@ -312,28 +297,28 @@ function radarChart(datum){
   return lookup
   }
 
-  lookup = Look(datum)
+  window.radarLookup = Look(datum)
 
-  var sample = [lookup['Иваново']]
-  // datum.forEach(function(d){console.log(d.cityname)})
-
-  // var sample = [{'name':'Омск', 'pop':9000, 'den':1000, 'gla':819, 'gba':999}];
+  var sample = [window.radarLookup['Иваново']]
   var max_pop = d3.max(datum.map(function(d){ return d.pop})),
       max_den = d3.max(datum.map(function(d){ return d.den})),
       max_gba = d3.max(datum.map(function(d){ return d.count})),
       max_gla = d3.max(datum.map(function(d){ return d.gla}));
-  // console.log([max_pop,max_den,max_gba,max_gla]);
-
+  
   //axis direction 
   // -y1-
   // x2-x1
   // -y2-
 
-  var y1 = d3.scale.linear().domain([0, max_pop]).range([height/2,0]);
-  var x1 = d3.scale.linear().domain([0, max_den]).range([width/2, width/2 +height/2]);
-  var y2 = d3.scale.linear().domain([0, max_gba]).range([height/2, height ]);
-  var x2 = d3.scale.linear().domain([0, max_gla]).range([width/2,width/2-height/2]);
+  var y1 = d3.scale.linear().domain([0, max_pop]).range([height/2,0]),
+      x1 = d3.scale.linear().domain([0, max_den]).range([width/2, width/2 +height/2]),
+      y2 = d3.scale.linear().domain([0, max_gba]).range([height/2, height ]),
+      x2 = d3.scale.linear().domain([0, max_gla]).range([width/2,width/2-height/2]);
 
+  window.radarAxises['y1']=y1;
+  window.radarAxises['x1']=x1;
+  window.radarAxises['y2']=y2;
+  window.radarAxises['x2']=x2;
   
   function convertCoord(d){
     var str="";
@@ -360,37 +345,71 @@ function radarChart(datum){
           .attr('id','pop' )
           .attr('cx',width/2 )
           .attr('cy', function(d){return y1(d.pop)} )
-          .transition().delay(function (d,i){ return i * 15;})
           .attr('r', crad )
-  
 
+    
       chart.append('circle')
           .attr('id','den' )
           .attr('cx',function(d){return x1(d.den) })
           .attr('cy', height/2 )
-          .transition().delay(function (d,i){ return i * 15;})
           .attr('r', crad )
-  
 
       chart.append('circle')
           .attr('id','count' )
           .attr('cx',width/2 )
           .attr('cy', function(d){return y2(d.count)} )
-          .transition().delay(function (d,i){ return i * 15;})
           .attr('r', crad )
-  
 
       chart.append('circle')
           .attr('id','gla' )
           .attr('cx', function(d){return x2(d.gla)} )
           .attr('cy', height/2 )
-          .transition().delay(function (d,i){ return i * 15;})
           .attr('r', crad )
+
+
+
+      chart.append('text')
+        .attr('id','popLabel')
+        .attr('class','valuelabel')
+        .attr('x', width/2 +5 )
+        .attr('y', function(d){return y1(d.pop) -5 } )
+        .text(function(d){return window.myFormatter(d.pop)})
+        .attr('text-anchor', 'start')
+  
+      chart.append('text')
+        .attr('id','countLabel')
+        .attr('class','valuelabel')
+        .attr('x', width/2 + 5 )
+        .attr('y', function(d){return y2(d.count)+10} )
+        .text(function(d){return window.myFormatter(d.count)})
+        .attr('text-anchor', 'start')
+
+      chart.append('text')
+        .attr('id','glaLabel')
+        .attr('class','valuelabel')
+        .attr('x', function(d){return x2(d.gla)- 5} )
+        .attr('y', height/2 - 5 )
+        .text(function(d){return window.myFormatter(d.gla)})
+        .attr('text-anchor', 'end')
+
+      chart.append('text')
+        .attr('id','denLabel')
+        .attr('class','valuelabel')
+        .attr('x', function(d){return x1(d.den)+5} )
+        .attr('y', height/2 -5 )
+        .text(function(d){return window.myFormatter(d.den)})
+        .attr('text-anchor', 'start')
+
+      // function labelPlacer(value, scl, zero){:
+      //   if (scl(value))
+      // }
+
 
     var x1Axis = d3.svg.axis().scale(x1).ticks(1).orient("bottom").tickValues([max_den]).tickFormat(window.myFormatter);
     var x2Axis = d3.svg.axis().scale(x2).ticks(1).orient("bottom").tickValues([max_gla]).tickFormat(window.myFormatter);
     var y1Axis = d3.svg.axis().scale(y1).ticks(1).orient("right").tickValues([max_pop]).tickFormat(window.myFormatter);
     var y2Axis = d3.svg.axis().scale(y2).ticks(1).orient("right").tickValues([max_gba]).tickFormat(window.myFormatter);
+    
 
     
 
@@ -438,6 +457,7 @@ function radarChart(datum){
             });
     
   // LABELS
+
   var Names =  d3.select('#radarWrapper svg')
             .append('g')
             .attr('id','Names')
@@ -474,15 +494,9 @@ function radarChart(datum){
 
     d3.selectAll(".content").on("click",function(){console.log('radar listener works!')})
     
-            // var name =d3.select(this).select('.text').text()
-            // d = [look[name]]
-
-            // chart.select('#area')
-            // .attr("points",   function(d){return convertCoord([[width/2, y1(d.pop)],[x1(d.den),height/2],[width/2, y2(d.count)],[x2(d.gla),height/2]])} )
-            // })
-             
-    
+                
 }
+
 
 
 function getData(){

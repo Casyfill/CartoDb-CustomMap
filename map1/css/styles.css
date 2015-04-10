@@ -16,6 +16,9 @@
     margin-right: auto;
 }
 
+#map .overlay-annotation {
+	cursor:pointer;
+}
 
 
 /*HEADER*/
@@ -162,6 +165,7 @@ h3 {
 	min-height: 35px;
 	font-size: 0.9em;
 	background-color: white;
+	cursor: pointer;
 
 }
 
@@ -180,7 +184,8 @@ h3 {
 	width:150px;
 	min-height: 35px;
 	font-size: 0.9em;
-	background-color: rgb(227,229,226) 	
+	background-color: rgb(227,229,226);
+	cursor: pointer;
 
 }
 
@@ -275,6 +280,12 @@ h6 {
 .axis text {
     font-family: sans-serif;
     font-size: 8px;
+}
+
+#radar .valuelabel {
+	font: 10px sans-serif;
+	fill:black;
+
 }
 
 .name {
