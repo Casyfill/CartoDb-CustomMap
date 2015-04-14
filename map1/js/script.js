@@ -41,7 +41,7 @@ function createMap(mapId, mapLink){
             tiles_loader: false,
             center_lat: 55,
             center_lon: 58,
-            zoom: 3
+            zoom: 4
 
         })
         .done(function(vis, layers) {
@@ -89,20 +89,20 @@ function createMap(mapId, mapLink){
                       
                     area.select('polygon')
                         .transition().delay(30)
-                        .attr('points',function(d){return convertCoord([[width/2, y1(sample.pop)],[x1(sample.den),height/2],[width/2, y2(sample.count)],[x2(sample.gla),height/2]])} )
+                        .attr('points',function(d){return convertCoord([[width/2, y1(sample.pop)],[x1(sample.count),height/2],[width/2, y2(sample.den)],[x2(sample.gla),height/2]])} )
 
                                     
                       // move circles
                     area.select('#pop').transition().delay(30).attr('cy', y1(sample.pop) )
-                    area.select('#den').transition().delay(30).attr('cx', x1(sample.den) )
+                    area.select('#den').transition().delay(30).attr('cy', y2(sample.den) )
                     area.select('#gla').transition().delay(30).attr('cx', x2(sample.gla) )
-                    area.select('#count').transition().delay(30).attr('cy', y2(sample.count) )
+                    area.select('#count').transition().delay(30).attr('cx', x1(sample.count) )
 
                     // console.log(area.select('#popLabel'))
                     area.select('#popLabel').text(function(){return window.myFormatter(sample.pop)}).transition().delay(30).attr('y', y1(sample.pop)-5 )
-                    area.select('#denLabel').text(function(){return window.myFormatter(sample.den)}).transition().delay(30).attr('x', x1(sample.den)+5 )
+                    area.select('#denLabel').text(function(){return window.myFormatter(sample.den)}).transition().delay(30).attr('y', y2(sample.den)+10 )
                     area.select('#glaLabel').text(function(){return window.myFormatter(sample.gla)}).transition().delay(30).attr('x', x2(sample.gla)-5 )
-                    area.select('#countLabel').text(function(){return window.myFormatter(sample.count)}).transition().delay(30).attr('y', y2(sample.count)-5 )
+                    area.select('#countLabel').text(function(){return window.myFormatter(sample.count)}).transition().delay(30).attr('x', x1(sample.count)+5 )
 
 
                     });
@@ -123,13 +123,14 @@ function localMap(mapId, mapLink, lonlatzoom){
             title: false,
             description: false,
             search: false,
+            infowindow:true,
             zoomControl: true,
             tiles_loader: false,
             center_lat: lonlatzoom[0],
             center_lon: lonlatzoom[1],
             zoom: lonlatzoom[2],
             scrollwheel:true,
-            infowindow:true
+            
         })
         .done(function(vis, layers) {
           layers[1].setInteraction(false);
@@ -311,8 +312,8 @@ function radarChart(datum){
   // -y2-
 
   var y1 = d3.scale.linear().domain([0, max_pop]).range([height/2,0]),
-      x1 = d3.scale.linear().domain([0, max_den]).range([width/2, width/2 +height/2]),
-      y2 = d3.scale.linear().domain([0, max_gba]).range([height/2, height ]),
+      x1 = d3.scale.linear().domain([0, max_gba]).range([width/2, width/2 +height/2]),
+      y2 = d3.scale.linear().domain([0, max_den]).range([height/2, height ]),
       x2 = d3.scale.linear().domain([0, max_gla]).range([width/2,width/2-height/2]);
 
   window.radarAxises['y1']=y1;
@@ -336,10 +337,10 @@ function radarChart(datum){
                 .attr('class','area')
       
       chart.append('polygon')   
-          .attr("points",   function(d){return convertCoord([[width/2, y1(d.pop)],[x1(d.den),height/2],[width/2, y2(d.count)],[x2(d.gla),height/2]])} )
+          .attr("points",   function(d){return convertCoord([[width/2, y1(d.pop)],[x1(d.count),height/2],[width/2, y2(d.den)],[x2(d.gla),height/2]])} )
           
 
-      var crad = 3;
+      var crad = 5;
 
       chart.append('circle')
           .attr('id','pop' )
@@ -349,15 +350,15 @@ function radarChart(datum){
 
     
       chart.append('circle')
-          .attr('id','den' )
-          .attr('cx',function(d){return x1(d.den) })
+          .attr('id','count' )
+          .attr('cx',function(d){return x1(d.count) })
           .attr('cy', height/2 )
           .attr('r', crad )
 
       chart.append('circle')
-          .attr('id','count' )
+          .attr('id','den' )
           .attr('cx',width/2 )
-          .attr('cy', function(d){return y2(d.count)} )
+          .attr('cy', function(d){return y2(d.den)} )
           .attr('r', crad )
 
       chart.append('circle')
@@ -377,11 +378,11 @@ function radarChart(datum){
         .attr('text-anchor', 'start')
   
       chart.append('text')
-        .attr('id','countLabel')
+        .attr('id','denLabel')
         .attr('class','valuelabel')
         .attr('x', width/2 + 5 )
-        .attr('y', function(d){return y2(d.count)+10} )
-        .text(function(d){return window.myFormatter(d.count)})
+        .attr('y', function(d){return y2(d.den)+10} )
+        .text(function(d){return window.myFormatter(d.den)})
         .attr('text-anchor', 'start')
 
       chart.append('text')
@@ -393,11 +394,11 @@ function radarChart(datum){
         .attr('text-anchor', 'end')
 
       chart.append('text')
-        .attr('id','denLabel')
+        .attr('id','countLabel')
         .attr('class','valuelabel')
-        .attr('x', function(d){return x1(d.den)+5} )
+        .attr('x', function(d){return x1(d.count)+5} )
         .attr('y', height/2 -5 )
-        .text(function(d){return window.myFormatter(d.den)})
+        .text(function(d){return window.myFormatter(d.count)})
         .attr('text-anchor', 'start')
 
       // function labelPlacer(value, scl, zero){:
@@ -405,10 +406,10 @@ function radarChart(datum){
       // }
 
 
-    var x1Axis = d3.svg.axis().scale(x1).ticks(1).orient("bottom").tickValues([max_den]).tickFormat(window.myFormatter);
+    var x1Axis = d3.svg.axis().scale(x1).ticks(1).orient("bottom").tickValues([max_gba]).tickFormat(window.myFormatter);
     var x2Axis = d3.svg.axis().scale(x2).ticks(1).orient("bottom").tickValues([max_gla]).tickFormat(window.myFormatter);
     var y1Axis = d3.svg.axis().scale(y1).ticks(1).orient("right").tickValues([max_pop]).tickFormat(window.myFormatter);
-    var y2Axis = d3.svg.axis().scale(y2).ticks(1).orient("right").tickValues([max_gba]).tickFormat(window.myFormatter);
+    var y2Axis = d3.svg.axis().scale(y2).ticks(1).orient("right").tickValues([max_den]).tickFormat(window.myFormatter);
     
 
     
@@ -490,7 +491,7 @@ function radarChart(datum){
       .append("text")
       .attr("transform", "translate(" + (width-10) + "," + height/2 + ")")
       .attr('class','name')
-      .text('GBA')
+      .text('ТЦ')
 
     d3.selectAll(".content").on("click",function(){console.log('radar listener works!')})
     

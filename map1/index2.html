@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+  <meta charset="utf-8">
+  <title>Анализ рынка коммерческой недвижимости, 2015 г.</title>
+  <link rel="shortcut icon" href="img/favicons.png" />
+  <script src="js/d3.js"></script>
+  <script src="js/script.js"></script>
+  <script src="http://libs.cartocdn.com/cartodb.js/v3/3.12/cartodb.js"></script>
+
+
+  <link href="css/styles.css" type="text/css" rel="stylesheet"/>
+  <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.12/themes/css/cartodb.css" />
+  <style>
+      html, body, #map {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+
+              }
+
+    </style>
+  </head>
+  
+    <body>
+      <div id='wrapper' >
+        <div id='map33'>
+          
+        </div>
+   
+
+      </div>
+
+    <script>
+      
+      function main() {
+        localMap('map33','https://rilosmaps.cartodb.com/u/philip/api/v2/viz/dcd7c9b8-dea9-11e4-9417-0e0c41326911/viz.json', [54.968537, 73.369185,10])
+      }
+      window.onload = main;
+    </script>
+
+  </body>
+</html>

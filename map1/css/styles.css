@@ -4,6 +4,10 @@
           box-sizing: border-box;
 }
 
+#map33 {
+          height: 800px;
+          width: 800px;
+        }
 
 
 #wrapper {
