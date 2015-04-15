@@ -20,6 +20,25 @@ myFormatter = ru.numberFormat(',.0f')
 var radarLookup = {};
 var radarAxises = {'x1':{},'x2':{},'y1':{},'y2':{}};
 
+
+function maxRounded(mvalue){
+  digits = mvalue.toString().length
+
+  xs = [1.5,2,5,10].map(function(d){return d*Math.pow(10,(digits-1))})
+  
+  var res
+  for (i=0, len = xs.length; i<len; i++){
+    if (mvalue<xs[i]){
+      res=xs[i]
+      break;
+    }
+  }
+  return res
+}
+
+
+
+
 function clicker(obj){
       console.log(obj)
       if (obj.class='Button'){
@@ -215,7 +234,8 @@ function barChart(datum){
 
           bar.append("rect")
               .attr("width", function(d){return x(d.pop)})
-              .attr("height", realBarHeight-4);
+              .attr("height", realBarHeight-4)
+              .attr('fill','rgb(35,59,96)');
 
           bar.append("text")
                 .attr("class","name")
@@ -234,6 +254,7 @@ function barChart(datum){
 
 
           function updateBars(id, bar,data){
+            var colors = {'pop': 'rgb(35,59,96)', 'count':'rgb(35,0,0)', 'gla':'rgb(35,200,10)', 'den':'rgb(3,200,96)'}
             var x = d3.scale.linear()
               .domain([0, d3.max(data, function(d) { return d[id] })])
               .range([0, width-100]);
@@ -247,6 +268,7 @@ function barChart(datum){
             bar.select('rect')
               .transition().delay(function (d,i){ return i * 15;})
               .attr("width", function(d){return x(d[id])})
+              .attr('fill',colors[id])
             
             bar.select('text.name')
               .text(function(d,i) { return (i+1) + '. ' + d.cityname; });
@@ -285,9 +307,6 @@ function radarChart(datum){
       .append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("id", 'radar')
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
    
   // lookap - создаем словарь объектов по имени
   function Look(d){
@@ -310,11 +329,11 @@ function radarChart(datum){
   // -y1-
   // x2-x1
   // -y2-
-
-  var y1 = d3.scale.linear().domain([0, max_pop]).range([height/2,0]),
-      x1 = d3.scale.linear().domain([0, max_gba]).range([width/2, width/2 +height/2]),
-      y2 = d3.scale.linear().domain([0, max_den]).range([height/2, height ]),
-      x2 = d3.scale.linear().domain([0, max_gla]).range([width/2,width/2-height/2]);
+  // console.log(max_pop + '_' + maxRounded(max_pop))
+  var y1 = d3.scale.linear().domain([0, maxRounded(max_pop)]).range([height/2,0]),
+      x1 = d3.scale.linear().domain([0, maxRounded(max_gba)]).range([width/2, width/2 +height/2]),
+      y2 = d3.scale.linear().domain([0, maxRounded(max_den)]).range([height/2, height ]),
+      x2 = d3.scale.linear().domain([0, maxRounded(max_gla)]).range([width/2,width/2-height/2]);
 
   window.radarAxises['y1']=y1;
   window.radarAxises['x1']=x1;
@@ -329,24 +348,97 @@ function radarChart(datum){
           return str;
     }
 
-  
-  var chart = d3.select('#radar').selectAll("g")
-                .data(sample)
-                .enter()
-                .append('g')
-                .attr('class','area')
       
+      var x1Axis = d3.svg.axis().scale(x1).ticks(1).orient("bottom").tickValues([maxRounded(max_gba)]).tickFormat(window.myFormatter);
+      var x2Axis = d3.svg.axis().scale(x2).ticks(1).orient("bottom").tickValues([maxRounded(max_gla)]).tickFormat(window.myFormatter);
+      var y1Axis = d3.svg.axis().scale(y1).ticks(1).orient("right").tickValues([maxRounded(max_pop)]).tickFormat(window.myFormatter);
+      var y2Axis = d3.svg.axis().scale(y2).ticks(1).orient("right").tickValues([maxRounded(max_den)]).tickFormat(window.myFormatter);
+      
+  
+      
+      var axisLayer =  d3.select('#radarWrapper svg')
+                        .append('g')
+                        .attr('id','AxisLayer')
+                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            axisLayer
+            .append('g')
+            .attr("class", "axis")
+            .attr("id", "x1Axis")
+            .attr("transform", "translate(0," + height/2 + ")")
+            .call(x1Axis);
+
+
+            axisLayer
+            .append('g')
+            .attr("class", "axis")
+            .attr("id", "x2Axis")
+            .attr("transform", "translate(0," + height/2  + ")")
+            .call(x2Axis);
+
+            axisLayer
+            .append('g')
+            .attr("class", "axis")
+            .attr("id", "y1Axis")
+            .attr("transform", "translate(" + (width/2) + ",0)")
+            .call(y1Axis);
+
+            axisLayer
+            .append('g')
+            .attr("class", "axis")
+            .attr("id", "y2Axis")
+            .attr("transform", "translate(" + (width/2) + ",0)")
+            .call(y2Axis);
+
+      // remove Zero tick  
+      axisLayer.selectAll(".tick")
+            .each(function (d, i) {
+              if ( d == 0 ) {
+                this.remove();
+              }
+              });
+    svg.append("g")
+    .attr("id", 'radar')
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+    var chart = d3.select('#radar').selectAll("g")
+                    .data(sample)
+                    .enter()
+                    .append('g')
+                    .attr('class','area');
+
       chart.append('polygon')   
           .attr("points",   function(d){return convertCoord([[width/2, y1(d.pop)],[x1(d.count),height/2],[width/2, y2(d.den)],[x2(d.gla),height/2]])} )
-          
+    
+      var tooltip = d3.select('body').append('div')
+          .attr('class','mytooltip')
+          .style("opacity", 0);          
 
-      var crad = 5;
+      var crad = 3;
+      
 
       chart.append('circle')
           .attr('id','pop' )
           .attr('cx',width/2 )
           .attr('cy', function(d){return y1(d.pop)} )
           .attr('r', crad )
+        //   .on('mouseover', function(d){
+        //     // console.log(d3.event.pageX)
+        //     tooltip.transition()
+        //       .duration(200)
+        //       .style('opacity', 0.9)
+        //       tooltip.html(window.myFormatter(d.pop))
+        //       .style("left", (d3.event.pageX + 5) + "px")    
+        //       .style("top", (d3.event.pageY - 33) + "px");  
+        //     })          
+        // .on("mouseout", function() {   
+        //     tooltip.transition()    
+        //         .duration(500)    
+        //         .style("opacity", 0); 
+        // });
+
+
 
     
       chart.append('circle')
@@ -354,108 +446,106 @@ function radarChart(datum){
           .attr('cx',function(d){return x1(d.count) })
           .attr('cy', height/2 )
           .attr('r', crad )
+        //   .on('mouseover', function(d){
+        //     // console.log(d3.event.pageX)
+        //     tooltip.transition()
+        //       .duration(200)
+        //       .style('opacity', 0.9)
+        //       tooltip.html(window.myFormatter(d.count))
+        //       .style("left", (d3.event.pageX + 5) + "px")    
+        //       .style("top", (d3.event.pageY - 33) + "px");  
+        //     })          
+        // .on("mouseout", function() {   
+        //     tooltip.transition()    
+        //         .duration(500)    
+        //         .style("opacity", 0); 
+        // });
 
       chart.append('circle')
           .attr('id','den' )
           .attr('cx',width/2 )
           .attr('cy', function(d){return y2(d.den)} )
           .attr('r', crad )
+        //   .on('mouseover', function(d){
+        //     // console.log(d3.event.pageX)
+        //     tooltip.transition()
+        //       .duration(200)
+        //       .style('opacity', 0.9)
+        //       tooltip.html(window.myFormatter(d.den))
+        //       .style("left", (d3.event.pageX + 5) + "px")    
+        //       .style("top", (d3.event.pageY - 33) + "px");  
+        //     })          
+        // .on("mouseout", function() {   
+        //     tooltip.transition()    
+        //         .duration(500)    
+        //         .style("opacity", 0); 
+        // });
 
       chart.append('circle')
           .attr('id','gla' )
           .attr('cx', function(d){return x2(d.gla)} )
           .attr('cy', height/2 )
           .attr('r', crad )
+        //   .on('mouseover', function(d){
+        //     // console.log(d3.event.pageX)
+        //     tooltip.transition()
+        //       .duration(200)
+        //       .style('opacity', 0.9)
+        //       tooltip.html(window.myFormatter(d.gla))
+        //       .style("left", (d3.event.pageX +5) + "px")    
+        //       .style("top", (d3.event.pageY - 33) + "px");  
+        //     })          
+        // .on("mouseout", function() {   
+        //     tooltip.transition()    
+        //         .duration(500)    
+        //         .style("opacity", 0); 
+        // });
 
 
+      
 
       chart.append('text')
         .attr('id','popLabel')
         .attr('class','valuelabel')
-        .attr('x', width/2 +5 )
+        .attr('x', width/2 -5 )
         .attr('y', function(d){return y1(d.pop) -5 } )
         .text(function(d){return window.myFormatter(d.pop)})
-        .attr('text-anchor', 'start')
+        .attr('text-anchor', 'end')
+        
   
       chart.append('text')
         .attr('id','denLabel')
         .attr('class','valuelabel')
-        .attr('x', width/2 + 5 )
+        .attr('x', width/2 - 5 )
         .attr('y', function(d){return y2(d.den)+10} )
         .text(function(d){return window.myFormatter(d.den)})
-        .attr('text-anchor', 'start')
+        .attr('text-anchor', 'end')
+        
 
       chart.append('text')
         .attr('id','glaLabel')
         .attr('class','valuelabel')
         .attr('x', function(d){return x2(d.gla)- 5} )
-        .attr('y', height/2 - 5 )
+        .attr('y', height/2 - 13 )
         .text(function(d){return window.myFormatter(d.gla)})
         .attr('text-anchor', 'end')
+        
 
       chart.append('text')
         .attr('id','countLabel')
         .attr('class','valuelabel')
         .attr('x', function(d){return x1(d.count)+5} )
-        .attr('y', height/2 -5 )
+        .attr('y', height/2 -13 )
         .text(function(d){return window.myFormatter(d.count)})
         .attr('text-anchor', 'start')
+
 
       // function labelPlacer(value, scl, zero){:
       //   if (scl(value))
       // }
 
 
-    var x1Axis = d3.svg.axis().scale(x1).ticks(1).orient("bottom").tickValues([max_gba]).tickFormat(window.myFormatter);
-    var x2Axis = d3.svg.axis().scale(x2).ticks(1).orient("bottom").tickValues([max_gla]).tickFormat(window.myFormatter);
-    var y1Axis = d3.svg.axis().scale(y1).ticks(1).orient("right").tickValues([max_pop]).tickFormat(window.myFormatter);
-    var y2Axis = d3.svg.axis().scale(y2).ticks(1).orient("right").tickValues([max_den]).tickFormat(window.myFormatter);
     
-
-    
-
-    var axisLayer =  d3.select('#radarWrapper svg')
-                      .append('g')
-                      .attr('id','AxisLayer')
-                      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-          axisLayer
-          .append('g')
-          .attr("class", "axis")
-          .attr("id", "x1Axis")
-          .attr("transform", "translate(0," + height/2 + ")")
-          .call(x1Axis);
-
-
-          axisLayer
-          .append('g')
-          .attr("class", "axis")
-          .attr("id", "x2Axis")
-          .attr("transform", "translate(0," + height/2  + ")")
-          .call(x2Axis);
-
-          axisLayer
-          .append('g')
-          .attr("class", "axis")
-          .attr("id", "y1Axis")
-          .attr("transform", "translate(" + (width/2) + ",0)")
-          .call(y1Axis);
-
-          axisLayer
-          .append('g')
-          .attr("class", "axis")
-          .attr("id", "y2Axis")
-          .attr("transform", "translate(" + (width/2) + ",0)")
-          .call(y2Axis);
-
-    
-    // remove Zero tick  
-    axisLayer.selectAll(".tick")
-          .each(function (d, i) {
-            if ( d == 0 ) {
-              this.remove();
-            }
-            });
     
   // LABELS
 

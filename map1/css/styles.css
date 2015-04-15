@@ -232,9 +232,9 @@ h6 {
 	 
 }
 
-#topChart rect {
+/*#topChart rect {
   fill: rgb(35,59,96);
-}
+}*/
 
 #topChart .name {
   fill: black;
@@ -268,6 +268,22 @@ h6 {
 	
 }
 
+div.mytooltip {	
+    position: absolute;			
+    text-align: left;
+    padding:8px;			
+    width: 60px;					
+    height: 24px;					
+    
+ 
+    background: rgb(35,59,96);	
+    border: 0px;		
+    pointer-events: none;			
+	font: 10px sans-serif; 
+    color:white;
+    vertical-align: middle;		
+}
+
 .axis .name{
 	text-anchor: start;
 	font: 8px sans-serif;
@@ -289,7 +305,7 @@ h6 {
 #radar .valuelabel {
 	font: 10px sans-serif;
 	fill:black;
-
+	font-weight:bold;
 }
 
 .name {
