@@ -19,7 +19,7 @@ myFormatter = ru.numberFormat(',.0f')
 
 var radarLookup = {};
 var radarAxises = {'x1':{},'x2':{},'y1':{},'y2':{}};
-
+var colors = {'pop': 'rgb(0, 25, 153)', 'count':'rgb(54,0,204)', 'gla':'rgb(0, 55, 153)', 'den':'rgb(25,108,255)'}
 
 function maxRounded(mvalue){
   digits = mvalue.toString().length
@@ -235,7 +235,7 @@ function barChart(datum){
           bar.append("rect")
               .attr("width", function(d){return x(d.pop)})
               .attr("height", realBarHeight-4)
-              .attr('fill','rgb(35,59,96)');
+              .attr('fill',window.colors['pop']);
 
           bar.append("text")
                 .attr("class","name")
@@ -254,7 +254,7 @@ function barChart(datum){
 
 
           function updateBars(id, bar,data){
-            var colors = {'pop': 'rgb(35,59,96)', 'count':'rgb(35,0,0)', 'gla':'rgb(35,200,10)', 'den':'rgb(3,200,96)'}
+            
             var x = d3.scale.linear()
               .domain([0, d3.max(data, function(d) { return d[id] })])
               .range([0, width-100]);
@@ -268,7 +268,7 @@ function barChart(datum){
             bar.select('rect')
               .transition().delay(function (d,i){ return i * 15;})
               .attr("width", function(d){return x(d[id])})
-              .attr('fill',colors[id])
+              .attr('fill',window.colors[id])
             
             bar.select('text.name')
               .text(function(d,i) { return (i+1) + '. ' + d.cityname; });
