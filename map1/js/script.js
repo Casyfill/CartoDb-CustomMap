@@ -149,6 +149,7 @@ function localMap(mapId, mapLink, lonlatzoom){
             center_lon: lonlatzoom[1],
             zoom: lonlatzoom[2],
             scrollwheel:true,
+            legends:false
             
         })
         .done(function(vis, layers) {
