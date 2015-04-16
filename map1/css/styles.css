@@ -24,6 +24,9 @@
 	cursor:pointer;
 }
 
+/*#map .overlay-annotation:hover{
+	fill: yellow;
+}*/
 
 /*HEADER*/
 

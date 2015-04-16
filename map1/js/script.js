@@ -21,6 +21,11 @@ var radarLookup = {};
 var radarAxises = {'x1':{},'x2':{},'y1':{},'y2':{}};
 var colors = {'pop': 'rgb(0, 25, 153)', 'count':'rgb(54,0,204)', 'gla':'rgb(0, 55, 153)', 'den':'rgb(25,108,255)'}
 
+var links = {'Иваново': {'link':'http://rilosmaps.cartodb.com/api/v2/viz/83684e08-dc41-11e4-90bf-0e0c41326911/viz.json', 'coordinates':[57.001333, 41.011776, 11]},
+              'Екатеринбург':{'link':' http://rilosmaps.cartodb.com/api/v2/viz/1f0f8220-dc44-11e4-91eb-0e018d66dc29/viz.json' , 'coordinates':[56.85719, 60.611731,10]}, 
+              'Омск':{'link':'https://rilosmaps.cartodb.com/u/philip/api/v2/viz/dcd7c9b8-dea9-11e4-9417-0e0c41326911/viz.json', 'coordinates':[54.968537, 73.369185,10]}};
+
+
 function maxRounded(mvalue){
   digits = mvalue.toString().length
 
@@ -68,17 +73,13 @@ function createMap(mapId, mapLink){
           
 
           d3.selectAll("#map .content").on("click",function(d){
-            var links = {'Иваново': {'link':'http://rilosmaps.cartodb.com/api/v2/viz/83684e08-dc41-11e4-90bf-0e0c41326911/viz.json', 'coordinates':[57.001333, 41.011776, 11]},
-
-                                     'Екатеринбург':{'link':' http://rilosmaps.cartodb.com/api/v2/viz/1f0f8220-dc44-11e4-91eb-0e018d66dc29/viz.json' , 'coordinates':[56.85719, 60.611731,10]}, 
-                                     'Омск':{'link':'https://rilosmaps.cartodb.com/u/philip/api/v2/viz/dcd7c9b8-dea9-11e4-9417-0e0c41326911/viz.json', 'coordinates':[54.968537, 73.369185,10]}};
-
+            
             console.log('onTitle at work!')
             var name =d3.select(this).select('.text').text()
             // console.log(links[name])
             d3.select('#cityName').text('г. ' + name)
             d3.select(map2.firstChild).remove()
-            localMap('map2',links[name]['link'],links[name]['coordinates'])
+            localMap('map2',window.links[name]['link'],window.links[name]['coordinates'])
 
             var area= d3.select('.area')
             function updateRadar(name,area){
@@ -142,7 +143,6 @@ function localMap(mapId, mapLink, lonlatzoom){
             title: false,
             description: false,
             search: false,
-            infowindow:true,
             zoomControl: true,
             tiles_loader: false,
             center_lat: lonlatzoom[0],
@@ -152,7 +152,7 @@ function localMap(mapId, mapLink, lonlatzoom){
             
         })
         .done(function(vis, layers) {
-          layers[1].setInteraction(false);
+          layers[1].setInteraction(true);
           layers[1].on('featureOver', function(e, latlng, pos, data) {
             cartodb.log.log(e, latlng, pos, data);
           });
@@ -161,6 +161,7 @@ function localMap(mapId, mapLink, lonlatzoom){
           // now, perform any operations you need
           // map.setZoom(3);
           // map.panTo([50.5, 30.5]);
+          // vis.addInfoWindow(map, layer, fields);
           
           function minimizeLegend(){
             
@@ -598,7 +599,7 @@ function getData(){
       dataset = d.features.map(function(d){return d.properties})
       createMap('map','https://rilosmaps.cartodb.com/u/philip/api/v2/viz/67bc4abe-de86-11e4-9832-0e0c41326911/viz.json')    
   
-      localMap('map2','http://rilosmaps.cartodb.com/api/v2/viz/de88a126-c1b5-11e4-a92a-0e0c41326911/viz.json', [56.965254, 40.976324, 11])
+      localMap('map2', window.links['Иваново']['link'], window.links['Иваново']['coordinates'])
       barChart(dataset)
       radarChart(dataset)
 
