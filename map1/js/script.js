@@ -19,7 +19,7 @@ myFormatter = ru.numberFormat(',.0f')
 
 var radarLookup = {};
 var radarAxises = {'x1':{},'x2':{},'y1':{},'y2':{}};
-var colors = {'pop': 'rgb(0, 25, 153)', 'count':'rgb(54,0,204)', 'gla':'rgb(0, 55, 153)', 'den':'rgb(25,108,255)'}
+var colors = {'pop': 'green', 'count':'purple', 'gla':'rgb(0, 55, 153)', 'den':'red'}
 
 var links = {'Иваново': {'link':'http://rilosmaps.cartodb.com/api/v2/viz/83684e08-dc41-11e4-90bf-0e0c41326911/viz.json', 'coordinates':[57.001333, 41.011776, 11]},
               'Екатеринбург':{'link':' http://rilosmaps.cartodb.com/api/v2/viz/1f0f8220-dc44-11e4-91eb-0e018d66dc29/viz.json' , 'coordinates':[56.85719, 60.611731,10]}, 
@@ -63,8 +63,8 @@ function createMap(mapId, mapLink){
             search: false,
             zoomControl: false,
             tiles_loader: false,
-            center_lat: 55,
-            center_lon: 58,
+            center_lat: 55.489351,
+            center_lon: 55.500999,
             zoom: 4
 
         })
@@ -280,7 +280,7 @@ function barChart(datum){
               .attr("x", function(d){return x(d[id])-5})
               .text(function(d,i) { return window.myFormatter(d[id]) });
 
-            var quantDict = {'pop':'Население, тыс. ч.','den':'Коммерческая плотность, кв. м. на тыс. жителей', 'gla':'Арендуемая площадь, кв. м.','count':'Количество торговых центров'};
+            var quantDict = {'pop':'Население, тыс. чел.','den':'Коммерческая плотность, кв. м. на тыс. жителей', 'gla':'Арендуемая площадь, кв. м.','count':'Количество торговых центров'};
 
             d3.select('#quant').text(quantDict[id])
 

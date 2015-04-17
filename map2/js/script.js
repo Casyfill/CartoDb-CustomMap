@@ -16,6 +16,7 @@ var ru = d3.locale({
 d3.format = ru.numberFormat;
 myFormatter = ru.numberFormat(',.0f')
 
+var colors = {'pop': 'rgb(0, 25, 153)', 'sal':'rgb(54,0,204)', 'den':'rgb(25,108,255)'}
 
 function clicker(id, c){
       if (c='Button'){
