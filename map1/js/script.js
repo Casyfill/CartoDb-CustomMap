@@ -23,7 +23,7 @@ var colors = {'pop': 'green', 'count':'purple', 'gla':'rgb(0, 55, 153)', 'den':'
 
 var links = {'Иваново': {'link':'http://rilosmaps.cartodb.com/api/v2/viz/83684e08-dc41-11e4-90bf-0e0c41326911/viz.json', 'coordinates':[57.001333, 41.011776, 11]},
               'Екатеринбург':{'link':' http://rilosmaps.cartodb.com/api/v2/viz/1f0f8220-dc44-11e4-91eb-0e018d66dc29/viz.json' , 'coordinates':[56.85719, 60.611731,10]}, 
-              'Омск':{'link':'https://rilosmaps.cartodb.com/u/philip/api/v2/viz/dcd7c9b8-dea9-11e4-9417-0e0c41326911/viz.json', 'coordinates':[54.968537, 73.369185,10]}};
+              'Омск':{'link':'http://rilosmaps.cartodb.com/api/v2/viz/928d5fba-dc44-11e4-aa84-0e853d047bba/viz.json', 'coordinates':[54.968537, 73.369185,10]}};
 
 
 function maxRounded(mvalue){
