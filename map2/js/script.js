@@ -16,7 +16,8 @@ var ru = d3.locale({
 d3.format = ru.numberFormat;
 myFormatter = ru.numberFormat(',.0f')
 myFloatFormatter = ru.numberFormat(',.1f')
-var colors = {'pop2014': 'green', 'salary2014':'purple', 'density2014':'rgb(0, 55, 153)'}
+myFloatFormatter2 = ru.numberFormat(',.2f')
+var colors = {'pop2014': 'red', 'salary2014':'purple', 'density2014':'rgb(0, 55, 153)'}
 var quantDict = {'pop2014':'Население, тыс. ч.','dencity2014':'Плотность, количество человек на кв. км.', 'salary2014':'Средняя зарплата, руб.'};
 
 Lookup = {};
@@ -60,7 +61,7 @@ function graphCharts(rayonId, datum){
   window.Lookup = Look(datum)
   var sample = [window.Lookup[rayonId]][0]
 
-  var margin = {top: 40, right: 25, bottom: 0, left: 50};
+  var margin = {top: 40, right: 25, bottom: 0, left: 40};
 
   var width = 346 - margin.left - margin.right,
       height = 304 - margin.top - margin.bottom;
@@ -167,7 +168,7 @@ function barChart(datum){
                 .attr("y", (realBarHeight / 2 -6))
                 .attr("dy", ".75em")
                 .attr("class","label")
-                .text(function(d) { return window.myFormatter(d.pop2014) });
+                .text(function(d) { return window.myFloatFormatter2(d.pop2014) });
 
 
 
@@ -332,7 +333,7 @@ function linechart(g, yArray, xArray, yRange, xRange, t, title){
   
 
   axisLayer.append('g')
-    .attr("transform", "translate("+ 0 +',' + (yRange[0]+50) + ")")
+    .attr("transform", "translate("+ 0 +',' + (yRange[0]+40) + ")")
     .append('text')
     .text(title)
     .attr("class", "graphtitle")
@@ -395,7 +396,7 @@ function cChart(id){
           
           g.append('rect')
           .attr('class',types[i])
-          .attr("width", '25px')
+          .attr("width", '20px')
           .attr("height", y(m[i+1]))
           .attr('y', h);
 
@@ -407,7 +408,7 @@ function cChart(id){
           if (m[i+1]!=0){
           g.append('text')
           .attr('class','bLabel')
-          .attr("x", '30px')
+          .attr("x", '25px')
           .attr('y', function(d){if((h+8)<=height){return h+8} else {return height}})
           .text(window.myFloatFormatter(m[i+1])+' %');
           }
@@ -419,6 +420,121 @@ function cChart(id){
     }
   
   htypeBars(htype,sample,moscow)
+
+  var sal = mWindow.append('g')
+                     .attr('id','salComp')
+                     .attr("transform", "translate(120,134)")
+
+  function compPrice(g,s,m){
+    sA = [s.price1room, s.price2rooms, s.price3rooms]
+    mA = [m.price1room, m.price2rooms, m.price3rooms]
+    
+    sMax = d3.max(sA.concat(mA))
+
+    var y = d3.scale.linear().domain([0, sMax]).range([0,height/4])
+    var y1 = d3.scale.linear().domain([0, sMax]).range([height/4,0])
+
+
+    // title
+    g.append('text')
+     .text('Средняя цена жилья')
+     .attr('class','chTitle')
+     .attr('y','11')
+     .append('tspan')
+     .text('руб./кв.м.')
+     .attr('y','25')
+     .attr('x','0')
+    
+    // Bars
+    var bars = g.append('g')
+     .attr('class','bars')
+     .attr("transform", "translate(0,40)")
+    
+     var yP = 75
+     var labels = ['1 комната','2 комнаты','3 комнаты']
+
+    for (var i = 0; i < 3; i++) {
+      console.log()
+      bars.append('rect')
+          .attr('class','sRect')
+          .attr('x',i*60 +15)
+          .attr('y',yP-y(sA[i]))
+          .attr('width','20')
+          .attr('height',y(sA[i])) 
+
+      bars.append('rect')
+          .attr('class','mRect')
+          .attr('x',i*60+23 +15)
+          .attr('y',yP-y(mA[i]))
+          .attr('width','20')
+          .attr('height',y(mA[i]))
+
+      // bars.append('text')
+      //     .attr('class','PriceLabel')
+      //     .attr('x',i*(60) +15 +20)
+      //     .attr('y',(yP -y(sA[i]) - 5))
+      //     .attr('text-anchor','end')
+      //     .text(window.myFormatter(sA[i]))
+
+      // bars.append('text')
+      //     .attr('class','PriceLabel')
+      //     .attr('x',i*(60) +23 +15 )
+      //     .attr('y',(yP -y(mA[i]) - 5))
+      //     .attr('text-anchor','start')
+      //     .text(window.myFormatter(mA[i]))
+
+      bars.append('text')
+          .attr('class','RoomLabel')
+          .attr('x',i*(60)+21.5 +15 )
+          .attr('y',(yP +15))
+          .attr('text-anchor','middle')
+          .text(labels[i])
+      
+    };
+    
+    var yAxis = d3.svg.axis().scale(y1).ticks(3).orient("left").tickFormat(window.myFormatter);
+
+    var axisLayer =  g.append('g')
+                    .attr('class','AxisLayer')
+              
+    axisLayer.append('g')
+      .attr("class", "axis")
+      .attr("transform", "translate(5,48)")
+      .call(yAxis);
+    
+
+    // R Square
+
+  }
+  compPrice(sal,sample,moscow)
+
+  var popComp = mWindow.append('g')
+                     .attr('id','popComp')
+                     .attr("transform", "translate(120,0)")
+
+  function compPop(g, s,m){
+    g.append('text')
+     .text('Население района, %')
+     .attr('class','chTitle')
+     .attr('y','11')
+    
+  }
+  compPop(popComp,sample.pop2014,moscow.pop2014)
+
+  var salComp = mWindow.append('g')
+                     .attr('id','salComp')
+                     .attr("transform", "translate(120,60)")
+
+  function compSal(g, s,m){
+    g.append('text')
+     .text('Средняя зарплата, руб.')
+     .attr('class','chTitle')
+     .attr('y','11')
+    
+  }
+  compSal(salComp,sample.salary2014,moscow.salary2014)
+
+
 }
 
 function getData(){
