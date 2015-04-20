@@ -15,8 +15,24 @@ var ru = d3.locale({
 });
 d3.format = ru.numberFormat;
 myFormatter = ru.numberFormat(',.0f')
+var colors = {'pop': 'green', 'sal':'purple', 'den':'rgb(0, 55, 153)'}
+Lookup = {};
 
-var colors = {'pop': 'rgb(0, 25, 153)', 'sal':'rgb(54,0,204)', 'den':'rgb(25,108,255)'}
+function maxRounded(mvalue){
+  digits = mvalue.toString().length
+
+  xs = [1.5,2,5,10].map(function(d){return d*Math.pow(10,(digits-1))})
+  
+  var res
+  for (i=0, len = xs.length; i<len; i++){
+    if (mvalue<xs[i]){
+      res=xs[i]
+      break;
+    }
+  }
+  return res
+}
+
 
 function clicker(id, c){
       if (c='Button'){
@@ -26,6 +42,36 @@ function clicker(id, c){
       } 
 }
 
+function graphCharts(rayonId, datum){
+  var data = datum
+
+  function Look(d){
+  var lookup = {};
+  for (var i = 0, len = d.length; i < len; i++) {
+      lookup[d[i].name1] = d[i];
+      console.log(d[i].name1)
+    }
+  return lookup
+  }
+
+  window.Lookup = Look(datum)
+  var sample = [window.Lookup[rayonId]]
+
+  var margin = {top: 10, right: 10, bottom: 10, left: 10};
+
+  var width = 300 - margin.left - margin.right,
+      height = 300 - margin.top - margin.bottom;
+
+  var svg = d3.select("#linechart")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom);
+
+  console.log(sample)
+  console.log([sample.pop2002 ,sample.pop2010 ,sample.pop2012 ,sample.pop2013 ,sample.pop2014])
+  linechart(svg,[sample.pop2002 ,sample.pop2010 ,sample.pop2012 ,sample.pop2013 ,sample.pop2014 ],[2002,2010,2011,2012,2013,2014],[height,0],[0,width])
+
+}
 
 function barChart(datum){
     var data = datum
@@ -57,14 +103,14 @@ function barChart(datum){
 
 
 
-          pop_data = data.sort(function(a,b){return d3.descending(a.pop_2014, b.pop_2014)}).slice(0,5);
-          den_data = data.sort(function(a,b){return d3.descending(a.dencity, b.dencity)}).slice(0,5);
-          sal_data = data.sort(function(a,b){return d3.descending(a.salary_2014, b.salary_2014)}).slice(0,5);
+          pop_data = data.sort(function(a,b){return d3.descending(a.pop2014, b.pop2014)}).slice(0,5);
+          den_data = data.sort(function(a,b){return d3.descending(a.density2014, b.density2014)}).slice(0,5);
+          sal_data = data.sort(function(a,b){return d3.descending(a.salary2014, b.salary2014)}).slice(0,5);
           
           console.log(pop_data);
           
           var x = d3.scale.linear()
-            .domain([0, d3.max(pop_data, function(d) { return d.pop_2014 })])
+            .domain([0, d3.max(pop_data, function(d) { return d.pop2014 })])
             .range([0, width-100]);
 
           // var barHeight = height/pop_data.length;
@@ -79,7 +125,7 @@ function barChart(datum){
               .attr("transform", function(d, i) { return "translate(100," + i * barHeight + ")"; });
 
           bar.append("rect")
-              .attr("width", function(d){return x(d.pop_2014)})
+              .attr("width", function(d){return x(d.pop2014)})
               .attr("height", realBarHeight-4);
 
           bar.append("text")
@@ -87,14 +133,14 @@ function barChart(datum){
                 .attr("x", -10)
                 .attr("y", barHeight/2-6)
                 .attr("dy", ".75em")
-                .text(function(d,i) { return (i+1) + '. ' + d.new_name; });
+                .text(function(d,i) { return (i+1) + '. ' + d.name1; });
 
           bar.append("text")
-                .attr("x", function(d){return x(d.pop_2014)- 5})
+                .attr("x", function(d){return x(d.pop2014)- 5})
                 .attr("y", (realBarHeight / 2 -6))
                 .attr("dy", ".75em")
                 .attr("class","label")
-                .text(function(d) { return window.myFormatter(d.pop_2014) });
+                .text(function(d) { return window.myFormatter(d.pop2014) });
 
 
 
@@ -111,14 +157,14 @@ function barChart(datum){
               .attr("width", function(d){return x(d[id])})
             
             bar.select('text.name')
-              .text(function(d,i) { return (i+1) + '. ' + d.new_name; });
+              .text(function(d,i) { return (i+1) + '. ' + d.name1; });
 
             bar.select('text.label')
               .transition().delay(function (d,i){ return i * 15;})
               .attr("x", function(d){return x(d[id])-5})
               .text(function(d,i) { return window.myFormatter(d[id]) });
 
-            var quantDict = {'pop_2014':'Население, тыс. ч.','dencity':'Плотность, количество человек на кв. км.', 'salary_2014':'Средняя зарплата, руб.'};
+            var quantDict = {'pop2014':'Население, тыс. ч.','dencity2014':'Плотность, количество человек на кв. км.', 'salary2014':'Средняя зарплата, руб.'};
 
             d3.select('#quant').text(quantDict[id])
 
@@ -126,9 +172,9 @@ function barChart(datum){
           }
           
           
-          d3.select('#pop').on('click', function(d){updateBars('pop_2014',bar, pop_data)});
-          d3.select('#sal').on('click', function(d){updateBars('salary_2014',bar, sal_data)});
-          d3.select('#den').on('click', function(d){updateBars('dencity',bar, den_data)});
+          d3.select('#pop').on('click', function(d){updateBars('pop2014',bar, pop_data)});
+          d3.select('#sal').on('click', function(d){updateBars('salary2014',bar, sal_data)});
+          d3.select('#den').on('click', function(d){updateBars('density2014',bar, den_data)});
         
     }
 
@@ -204,20 +250,71 @@ function localMap(mapId, mapLink, lonlatzoom){
         });
       }
 
+
+
+function linechart(g, yArray, xArray, yRange, xRange){
+
+  function convertCoord(d){
+      var str="";
+        for(var pti=0;pti<d.length;pti++){
+            str=str+d[pti][0]+","+d[pti][1]+" ";
+            }
+            return str;
+  }
+
+  function zip(arrays) {
+      return arrays[0].map(function(_,i){
+          return arrays.map(function(array){return array[i]})
+      });
+  }
+
+  var xMax = maxRounded(d3.max(xArray)),
+      yMax = maxRounded(d3.max(yArray));
+  
+  var y1 = d3.scale.linear().domain([0, yMax]).range(yRange),
+      x1 = d3.scale.linear().domain([0, xMax]).range(xRange);
+  
+  g.append('polyline')
+   .attr("points",   function(d){return convertCoord([zip([xArray,yArray])])} )
+   .attr('class','graplines')
+
+  var xAxis = d3.svg.axis().scale(x1).ticks(1).orient("bottom").tickValues(xMax).tickFormat(window.myFormatter);
+  var yAxis = d3.svg.axis().scale(y1).ticks(1).orient("left").tickValues(yMax).tickFormat(window.myFormatter);
+
+  var axisLayer =  g.append('g')
+                    .attr('class','AxisLayer')
+              
+
+  axisLayer.append('g')
+    .attr("id", "xAxis")
+    .attr("class", "axis")
+    .attr("transform", "translate("+ xRange[0] +',' + yRange[1] + ")")
+    .call(xAxis);
+
+  axisLayer.append('g')
+    .attr("id", "yAxis")
+    .attr("class", "axis")
+    .attr("transform", "translate("+ xRange[0] +',' + yRange[1] + ")")
+    .call(yAxis);
+}  
+
+
 function getData(){
   
     
         
-    d3.json("http://philip.cartodb.com/api/v2/sql?q=SELECT * FROM raydatum &format=geojson&dp=5",  function(error, d){
+    d3.json("http://philip.cartodb.com/api/v2/sql?q=SELECT * FROM mosrayons &format=geojson&dp=5",  function(error, d){
       dataset = d.features.map(function(d){return d.properties})
       createMap('map1','https://cityfish.cartodb.com/api/v2/viz/36a22e32-cb60-11e4-bfa2-0e853d047bba/viz.json')
       localMap('map2','http://rilosmaps.cartodb.com/api/v2/viz/1d6f5f4c-cd6e-11e4-b9ec-0e018d66dc29/viz.json', [56.965766, 40.99548, 13])
       barChart(dataset)
+      graphCharts('Академический',dataset)
+      
       
     });
           
 }
-      
+    
               
 
 
