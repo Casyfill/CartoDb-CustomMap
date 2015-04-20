@@ -15,6 +15,7 @@ var ru = d3.locale({
 });
 d3.format = ru.numberFormat;
 myFormatter = ru.numberFormat(',.0f')
+myFloatFormatter = ru.numberFormat(',.1f')
 var colors = {'pop2014': 'green', 'salary2014':'purple', 'density2014':'rgb(0, 55, 153)'}
 var quantDict = {'pop2014':'Население, тыс. ч.','dencity2014':'Плотность, количество человек на кв. км.', 'salary2014':'Средняя зарплата, руб.'};
 
@@ -59,7 +60,7 @@ function graphCharts(rayonId, datum){
   window.Lookup = Look(datum)
   var sample = [window.Lookup[rayonId]][0]
 
-  var margin = {top: 40, right: 25, bottom: 0, left: 10};
+  var margin = {top: 40, right: 25, bottom: 0, left: 50};
 
   var width = 346 - margin.left - margin.right,
       height = 304 - margin.top - margin.bottom;
@@ -278,8 +279,6 @@ function localMap(mapId, mapLink, lonlatzoom){
         });
       }
 
-
-
 function linechart(g, yArray, xArray, yRange, xRange, t, title){
 
   function convertCoord(d){
@@ -301,8 +300,6 @@ function linechart(g, yArray, xArray, yRange, xRange, t, title){
       xMin = d3.min(xArray),
       yMin = d3.min(yArray);
 
-console.log(yMax, yMin)
-  
   var y1 = d3.scale.linear().domain([yMin, yMax]).range(yRange),
       x1 = d3.scale.linear().domain([2000, 2015]).range(xRange);
   
@@ -345,6 +342,84 @@ console.log(yMax, yMin)
 
 }  
 
+function cChart(id){
+  console.log('compareChart in work!')
+  var sample = [window.Lookup[id]][0]
+  var moscow = [window.Lookup['Москва']][0]
+
+  // SVG
+  var margin = {top: 20, right: 25, bottom: 20, left: 25};
+
+  var width = 346 - margin.left - margin.right,
+      height = 304 - margin.top - margin.bottom;
+
+  var svg = d3.select("#compareChart")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom);
+
+  var mWindow = svg.append('g')
+                  .attr('id','charts')
+                  .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+  var htype = mWindow.append('g')
+                     .attr('id','htype')
+
+  function htypeBars(g,sample,moscow){
+    var y = d3.scale.linear().domain([0, 100]).range([0,height])
+
+    var d = [0,
+             sample.privatehousingpercent,
+             sample.multistoreyresadmpercentt,
+             sample.multistoreyrespercent,
+             sample.underconstructionpercent]
+    
+    var m = [0,
+             moscow.privatehousingpercent,
+             moscow.multistoreyresadmpercentt,
+             moscow.multistoreyrespercent,
+             moscow.underconstructionpercent]
+
+  
+    g.append('g').attr('id','brs1')
+    g.append('g').attr('id','brs2').attr("transform", "translate(60,0)")
+    var brs1 = g.select('#brs1')
+    var brs2 = g.select('#brs2')
+
+    function stackBar(g,m){
+      // generate stacked barchart with percent labels
+      var types = ['private','msra','msr','uc']
+      h = 0
+      for (var i=0; i<4; i++){
+          h+=y(m[i])
+          
+          g.append('rect')
+          .attr('class',types[i])
+          .attr("width", '25px')
+          .attr("height", y(m[i+1]))
+          .attr('y', h);
+
+        }
+      
+      h = 0
+      for (var i=0; i<4; i++){
+          h+=y(m[i])
+          if (m[i+1]!=0){
+          g.append('text')
+          .attr('class','bLabel')
+          .attr("x", '30px')
+          .attr('y', function(d){if((h+8)<=height){return h+8} else {return height}})
+          .text(window.myFloatFormatter(m[i+1])+' %');
+          }
+        }
+      }
+  
+    stackBar(brs1,m)
+    stackBar(brs2,d)
+    }
+  
+  htypeBars(htype,sample,moscow)
+}
 
 function getData(){
   
@@ -356,6 +431,7 @@ function getData(){
       localMap('map2','http://rilosmaps.cartodb.com/api/v2/viz/1d6f5f4c-cd6e-11e4-b9ec-0e018d66dc29/viz.json', [56.965766, 40.99548, 13])
       barChart(dataset)
       graphCharts('Академический',dataset)
+      cChart('Академический')
       
       
     });
