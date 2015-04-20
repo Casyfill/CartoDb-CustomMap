@@ -119,6 +119,19 @@ h3 {
 	
 }
 
+.graphtitle{
+font-family: sans-serif;
+font-size: 0.7em;
+font-weight:bold;	
+}
+
+.graphlines {
+	fill:none;
+	stroke:rgb(81, 128, 200);
+	stroke-width:2
+
+}
+
 /*block3*/
 #block3 {
 	height: calc(214px + 36px);
@@ -259,10 +272,10 @@ h6 {
 	 
 }
 
-#topChart rect {
+/*#topChart rect {
   fill: rgb(35,59,96);
 }
-
+*/
 #topChart .name {
   fill: black;
   font: 10px sans-serif;

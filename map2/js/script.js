@@ -15,7 +15,9 @@ var ru = d3.locale({
 });
 d3.format = ru.numberFormat;
 myFormatter = ru.numberFormat(',.0f')
-var colors = {'pop': 'green', 'sal':'purple', 'den':'rgb(0, 55, 153)'}
+var colors = {'pop2014': 'green', 'salary2014':'purple', 'density2014':'rgb(0, 55, 153)'}
+var quantDict = {'pop2014':'Население, тыс. ч.','dencity2014':'Плотность, количество человек на кв. км.', 'salary2014':'Средняя зарплата, руб.'};
+
 Lookup = {};
 
 function maxRounded(mvalue){
@@ -49,27 +51,49 @@ function graphCharts(rayonId, datum){
   var lookup = {};
   for (var i = 0, len = d.length; i < len; i++) {
       lookup[d[i].name1] = d[i];
-      console.log(d[i].name1)
+      
     }
   return lookup
   }
 
   window.Lookup = Look(datum)
-  var sample = [window.Lookup[rayonId]]
+  var sample = [window.Lookup[rayonId]][0]
 
-  var margin = {top: 10, right: 10, bottom: 10, left: 10};
+  var margin = {top: 40, right: 25, bottom: 0, left: 10};
 
-  var width = 300 - margin.left - margin.right,
-      height = 300 - margin.top - margin.bottom;
+  var width = 346 - margin.left - margin.right,
+      height = 304 - margin.top - margin.bottom;
 
   var svg = d3.select("#linechart")
       .append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom);
 
-  console.log(sample)
-  console.log([sample.pop2002 ,sample.pop2010 ,sample.pop2012 ,sample.pop2013 ,sample.pop2014])
-  linechart(svg,[sample.pop2002 ,sample.pop2010 ,sample.pop2012 ,sample.pop2013 ,sample.pop2014 ],[2002,2010,2011,2012,2013,2014],[height,0],[0,width])
+  var charts = svg.append('g')
+                  .attr('id','grapcharts')
+                  .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+  
+  function splitRangeEndOffset(range,num, offset){
+      // splits range into chinks without
+      var sh = (range[1]-range[0])/num
+      
+      r = [];
+      for (i=0, len = num; i<len; i++){
+      s = range[0] +(sh)*i
+      e = s + sh-offset
+      r.push([s,e])
+      }
+
+      return r
+    }
+
+  // console.log(splitRange([0,8],2))
+
+  hs = splitRangeEndOffset([0,height],2, 70)
+  // 
+  linechart(charts,[sample.salary2012 ,sample.salary2013 ,sample.salary2014],[2012,2013,2014],[hs[1][1],hs[1][0]],[0,width], true, window.quantDict['salary2014'])
+  linechart(charts,[sample.pop2002 ,sample.pop2010 ,sample.pop2012 ,sample.pop2013 ,sample.pop2014 ],[2002,2010,2012,2013,2014],[hs[0][1],hs[0][0]],[0,width], false, window.quantDict['pop2014'])
 
 }
 
@@ -107,7 +131,7 @@ function barChart(datum){
           den_data = data.sort(function(a,b){return d3.descending(a.density2014, b.density2014)}).slice(0,5);
           sal_data = data.sort(function(a,b){return d3.descending(a.salary2014, b.salary2014)}).slice(0,5);
           
-          console.log(pop_data);
+          
           
           var x = d3.scale.linear()
             .domain([0, d3.max(pop_data, function(d) { return d.pop2014 })])
@@ -125,8 +149,10 @@ function barChart(datum){
               .attr("transform", function(d, i) { return "translate(100," + i * barHeight + ")"; });
 
           bar.append("rect")
+              .attr('fill',window.colors['pop2014'])
               .attr("width", function(d){return x(d.pop2014)})
-              .attr("height", realBarHeight-4);
+              .attr("height", realBarHeight-4)
+
 
           bar.append("text")
                 .attr("class","name")
@@ -155,6 +181,7 @@ function barChart(datum){
             bar.select('rect')
               .transition().delay(function (d,i){ return i * 15;})
               .attr("width", function(d){return x(d[id])})
+              .attr('fill',window.colors[id])
             
             bar.select('text.name')
               .text(function(d,i) { return (i+1) + '. ' + d.name1; });
@@ -164,9 +191,9 @@ function barChart(datum){
               .attr("x", function(d){return x(d[id])-5})
               .text(function(d,i) { return window.myFormatter(d[id]) });
 
-            var quantDict = {'pop2014':'Население, тыс. ч.','dencity2014':'Плотность, количество человек на кв. км.', 'salary2014':'Средняя зарплата, руб.'};
+            
 
-            d3.select('#quant').text(quantDict[id])
+            d3.select('#quant').text(window.quantDict[id])
 
             
           }
@@ -186,12 +213,13 @@ function createMap(mapId, mapLink){
             title: false,
             description: false,
             search: false,
-            zoomControl: false,
+            zoomControl: true,
             tiles_loader: false,
             center_lat: 55.799497,
             center_lon: 37.618013,
             legend:false,
-            zoom: 9
+            infowindow:true,
+            zoom: 10
 
         })
         .done(function(vis, layers) {
@@ -210,7 +238,7 @@ function localMap(mapId, mapLink, lonlatzoom){
             title: false,
             description: false,
             search: false,
-            zoomControl: false,
+            zoomControl: true,
             tiles_loader: false,
             center_lat: lonlatzoom[0],
             center_lon: lonlatzoom[1],
@@ -230,7 +258,7 @@ function localMap(mapId, mapLink, lonlatzoom){
           // map.panTo([50.5, 30.5]);
           
           function minimizeLegend(){
-            
+            //TODO: работает на чужую карту
             var box = d3.selectAll('.cartodb-legend-stack').style('bottom','246px').style('right','5px')
             box.select('.cartodb-legend').style('padding','6px').style('padding-bottom','0px')
             box.select('.legend-title').style('margin-bottom','0px')
@@ -242,7 +270,7 @@ function localMap(mapId, mapLink, lonlatzoom){
             
           }
 
-          minimizeLegend();
+          minimizeLegend();  
         
         })
         .error(function(err) {
@@ -252,7 +280,7 @@ function localMap(mapId, mapLink, lonlatzoom){
 
 
 
-function linechart(g, yArray, xArray, yRange, xRange){
+function linechart(g, yArray, xArray, yRange, xRange, t, title){
 
   function convertCoord(d){
       var str="";
@@ -268,34 +296,53 @@ function linechart(g, yArray, xArray, yRange, xRange){
       });
   }
 
-  var xMax = maxRounded(d3.max(xArray)),
-      yMax = maxRounded(d3.max(yArray));
-  
-  var y1 = d3.scale.linear().domain([0, yMax]).range(yRange),
-      x1 = d3.scale.linear().domain([0, xMax]).range(xRange);
-  
-  g.append('polyline')
-   .attr("points",   function(d){return convertCoord([zip([xArray,yArray])])} )
-   .attr('class','graplines')
+  var xMax = d3.max(xArray),
+      yMax = d3.max(yArray),
+      xMin = d3.min(xArray),
+      yMin = d3.min(yArray);
 
-  var xAxis = d3.svg.axis().scale(x1).ticks(1).orient("bottom").tickValues(xMax).tickFormat(window.myFormatter);
-  var yAxis = d3.svg.axis().scale(y1).ticks(1).orient("left").tickValues(yMax).tickFormat(window.myFormatter);
+console.log(yMax, yMin)
+  
+  var y1 = d3.scale.linear().domain([yMin, yMax]).range(yRange),
+      x1 = d3.scale.linear().domain([2000, 2015]).range(xRange);
+  
+
+  var xmArray = xArray.map(function(d){return x1(d)}),
+      ymArray = yArray.map(function(d){return y1(d)});
+
+
+  g.append('polyline')
+   .attr("points", function(){return convertCoord(zip([xmArray,ymArray]))} )
+   .attr('class','graphlines')
+
+  var xAxis = d3.svg.axis().scale(x1).ticks(1).orient("bottom").tickValues([2000,2005,2010,2015]);
+  var yAxis = d3.svg.axis().scale(y1).ticks(3).orient("left").tickFormat(window.myFormatter);
 
   var axisLayer =  g.append('g')
                     .attr('class','AxisLayer')
               
-
   axisLayer.append('g')
-    .attr("id", "xAxis")
     .attr("class", "axis")
-    .attr("transform", "translate("+ xRange[0] +',' + yRange[1] + ")")
-    .call(xAxis);
-
-  axisLayer.append('g')
-    .attr("id", "yAxis")
-    .attr("class", "axis")
-    .attr("transform", "translate("+ xRange[0] +',' + yRange[1] + ")")
+    .attr("transform", "translate("+ 0 +',' + 0 + ")")
     .call(yAxis);
+
+  
+  
+  axisLayer.append('g')  
+    .attr("class", "axis")
+    .attr("transform", "translate("+ 0 +',' + (yRange[0]+10) + ")")
+    .call(xAxis);
+  
+
+  axisLayer.append('g')
+    .attr("transform", "translate("+ 0 +',' + (yRange[0]+50) + ")")
+    .append('text')
+    .text(title)
+    .attr("class", "graphtitle")
+    .attr('text-anchor', 'start')
+    // .attr('font-family','sams-serif')
+    // .attr('font-size','1px')
+
 }  
 
 
@@ -305,7 +352,7 @@ function getData(){
         
     d3.json("http://philip.cartodb.com/api/v2/sql?q=SELECT * FROM mosrayons &format=geojson&dp=5",  function(error, d){
       dataset = d.features.map(function(d){return d.properties})
-      createMap('map1','https://cityfish.cartodb.com/api/v2/viz/36a22e32-cb60-11e4-bfa2-0e853d047bba/viz.json')
+      createMap('map1','https://rilosmaps.cartodb.com/u/philip/api/v2/viz/f9cbd828-e761-11e4-9ba6-0e9d821ea90d/viz.json')
       localMap('map2','http://rilosmaps.cartodb.com/api/v2/viz/1d6f5f4c-cd6e-11e4-b9ec-0e018d66dc29/viz.json', [56.965766, 40.99548, 13])
       barChart(dataset)
       graphCharts('Академический',dataset)
