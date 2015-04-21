@@ -18,7 +18,7 @@ myFormatter = ru.numberFormat(',.0f')
 myFloatFormatter = ru.numberFormat(',.1f')
 myFloatFormatter2 = ru.numberFormat(',.2f')
 var colors = {'pop2014': 'red', 'salary2014':'purple', 'density2014':'rgb(0, 55, 153)'}
-var quantDict = {'pop2014':'Население, тыс. ч.','dencity2014':'Плотность, количество человек на кв. км.', 'salary2014':'Средняя зарплата, руб.'};
+var quantDict = {'pop2014':'Население, тыс. чел.','density2014':'Плотность, количество человек на кв. км.', 'salary2014':'Средняя зарплата, руб.'};
 
 Lookup = {};
 
@@ -122,7 +122,7 @@ function barChart(datum){
        .append('text')
        .attr('id','quant')
        .attr("transform", "translate(" + (width) + "," + (height-4) + ")")
-       .text('Население, чел.')
+       .text(window.quantDict['pop2014'])
 
 
     var g = d3.select("#basic")
@@ -301,7 +301,7 @@ function linechart(g, yArray, xArray, yRange, xRange, t, title){
       xMin = d3.min(xArray),
       yMin = d3.min(yArray);
 
-  var y1 = d3.scale.linear().domain([yMin, yMax]).range(yRange),
+  var y1 = d3.scale.linear().domain([0, yMax]).range(yRange),
       x1 = d3.scale.linear().domain([2000, 2015]).range(xRange);
   
 
@@ -313,8 +313,8 @@ function linechart(g, yArray, xArray, yRange, xRange, t, title){
    .attr("points", function(){return convertCoord(zip([xmArray,ymArray]))} )
    .attr('class','graphlines')
 
-  var xAxis = d3.svg.axis().scale(x1).ticks(1).orient("bottom").tickValues([2000,2005,2010,2015]);
-  var yAxis = d3.svg.axis().scale(y1).ticks(3).orient("left").tickFormat(window.myFormatter);
+  var xAxis = d3.svg.axis().scale(x1).orient("bottom").tickValues([2000,2005,2010,2015]);
+  var yAxis = d3.svg.axis().scale(y1).tickValues([0,yMin,yMax]).orient("left").tickFormat(window.myFormatter);
 
   var axisLayer =  g.append('g')
                     .attr('class','AxisLayer')
