@@ -21,6 +21,10 @@ var colors = {'pop2014': 'red', 'salary2014':'purple', 'density2014':'rgb(0, 55,
 var quantDict = {'pop2014':'Население, тыс. чел.','density2014':'Плотность, количество человек на кв. км.', 'salary2014':'Средняя зарплата, руб.'};
 
 
+var lgWidth
+var lgHeigth
+var lYs=[]
+
 // links to map
 var maps = {'Северное Тушино': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/0583de02-e822-11e4-94a9-0e4fddd5de28/viz.json', 'coordinates':[55.864266,37.427031,13]},
           'Щукино': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/4444049a-e823-11e4-ae67-0e853d047bba/viz.json', 'coordinates':[55.8016,37.4744,13]},
@@ -70,10 +74,14 @@ function graphCharts(rayonId, datum){
   window.Lookup = Look(datum)
   var sample = [window.Lookup[rayonId]][0]
 
-  var margin = {top: 40, right: 25, bottom: 0, left: 40};
+  margin = {top: 30, right: 25, bottom: 0, left: 40};
 
-  var width = 346 - margin.left - margin.right,
-      height = 304 - margin.top - margin.bottom;
+  width = 346 - margin.left - margin.right
+  height = 304 - margin.top - margin.bottom;
+
+  // window.lgMargin=margin
+  window.lgWidth=width
+  window.lgHeigth=height
 
   var svg = d3.select("#linechart")
       .append("svg")
@@ -101,10 +109,18 @@ function graphCharts(rayonId, datum){
 
   // console.log(splitRange([0,8],2))
 
-  hs = splitRangeEndOffset([0,height],2, 70)
+  // hs = splitRangeEndOffset([0,height],2, 70)
+  var h = 80;
+  g1 = charts.append('g')
+            .attr('id','lPop')
+            .attr("transform", "translate(0," + 0 + ")")
+
+  g2 = charts.append('g')
+            .attr('id','lSal')
+            .attr("transform", "translate(0," + 148 + ")")
   // 
-  linechart(charts,[sample.salary2012 ,sample.salary2013 ,sample.salary2014],[2012,2013,2014],[hs[1][1],hs[1][0]],[0,width], true, window.quantDict['salary2014'])
-  linechart(charts,[sample.pop2002 ,sample.pop2010 ,sample.pop2012 ,sample.pop2013 ,sample.pop2014 ],[2002,2010,2012,2013,2014],[hs[0][1],hs[0][0]],[0,width], false, window.quantDict['pop2014'])
+  linechart(g2,[sample.salary2012 ,sample.salary2013 ,sample.salary2014],[2012,2013,2014],width,h, true, window.quantDict['salary2014'])
+  linechart(g1,[sample.pop2002 ,sample.pop2010 ,sample.pop2012 ,sample.pop2013 ,sample.pop2014 ],[2002,2010,2012,2013,2014],width,h, false, window.quantDict['pop2014'])
 
 }
 
@@ -242,12 +258,11 @@ function createMap(mapId, mapLink){
         })
         .error(function(err) {
           console.log(err);
-        });
-      
-
+        });      
       }
 
 function mapClick(e, latlng, pos, data, layerIndex) {
+          // reaction on polygon click in the main map
           var id= data.namenew ;
           
           d3.select('#rayonId').text('район '+id)
@@ -255,6 +270,8 @@ function mapClick(e, latlng, pos, data, layerIndex) {
         
           d3.select(map2.firstChild).remove()
           localMap('map2',window.maps[id]['link'], window.maps[id]['coordinates']);
+
+          updateGraph(id)
 
           }
 
@@ -302,70 +319,97 @@ function localMap(mapId, mapLink, lonlatzoom){
         .error(function(err) {
           console.log(err);
         });
-      }
-
-function linechart(g, yArray, xArray, yRange, xRange, t, title){
-
-  function convertCoord(d){
-      var str="";
-        for(var pti=0;pti<d.length;pti++){
-            str=str+d[pti][0]+","+d[pti][1]+" ";
-            }
-            return str;
   }
 
-  function zip(arrays) {
-      return arrays[0].map(function(_,i){
-          return arrays.map(function(array){return array[i]})
-      });
-  }
+function linechart(g, yArray, xArray, width, height, t, title){
 
-  var xMax = d3.max(xArray),
-      yMax = d3.max(yArray),
-      xMin = d3.min(xArray),
+
+  var yMax = d3.max(yArray),
       yMin = d3.min(yArray);
+      // xMax = d3.max(xArray),
+      // xMin = d3.min(xArray),
+      
 
-  var y1 = d3.scale.linear().domain([0, yMax]).range(yRange),
-      x1 = d3.scale.linear().domain([2000, 2015]).range(xRange);
+  var hd = 15 ;   
+
+  var y1 = d3.scale.linear().domain([0, yMax]).range([height,0]),
+      x1 = d3.scale.linear().domain([2000, 2015]).range([0,width]);
   
 
   var xmArray = xArray.map(function(d){return x1(d)}),
       ymArray = yArray.map(function(d){return y1(d)});
 
+  g.append('text')
+    .text(title)
+    .attr("class", "graphtitle")
+    .attr('text-anchor', 'start')
 
-  g.append('polyline')
+  var graph = g.append('g')
+               .attr('class','graph')
+               .attr("transform", "translate(0,"+hd+")")
+
+
+  
+  graph.append('polyline')
    .attr("points", function(){return convertCoord(zip([xmArray,ymArray]))} )
    .attr('class','graphlines')
 
   var xAxis = d3.svg.axis().scale(x1).orient("bottom").tickValues([2000,2005,2010,2015]);
   var yAxis = d3.svg.axis().scale(y1).tickValues([0,yMin,yMax]).orient("left").tickFormat(window.myFormatter);
 
-  var axisLayer =  g.append('g')
+  var axisLayer =  graph.append('g')
                     .attr('class','AxisLayer')
               
   axisLayer.append('g')
+    .attr("id", "yAxis")
     .attr("class", "axis")
-    .attr("transform", "translate("+ 0 +',' + 0 + ")")
+    .attr("transform", "translate(0,0)")
     .call(yAxis);
 
-  
-  
+
   axisLayer.append('g')  
+    .attr("id", "xAxis")
     .attr("class", "axis")
-    .attr("transform", "translate("+ 0 +',' + (yRange[0]+10) + ")")
+    .attr("transform", "translate("+ 0 +',' + (height+10) + ")")
     .call(xAxis);
+
+
+  } 
+   
+
+function updateLinechart(id, yArray, xArray, width, height, delayTime){
   
+  // get max's
+  var yMax = d3.max(yArray),
+      yMin = d3.min(yArray);
 
-  axisLayer.append('g')
-    .attr("transform", "translate("+ 0 +',' + (yRange[0]+40) + ")")
-    .append('text')
-    .text(title)
-    .attr("class", "graphtitle")
-    .attr('text-anchor', 'start')
-    // .attr('font-family','sams-serif')
-    // .attr('font-size','1px')
 
-}  
+  // two axises
+  var y1 = d3.scale.linear().domain([0, yMax]).range([height,0]),
+      x1 = d3.scale.linear().domain([2000, 2015]).range([0,width]);
+
+
+  
+  // scale arrays
+  var xmArray = xArray.map(function(d){return x1(d)}),
+      ymArray = yArray.map(function(d){return y1(d)});
+
+  var yAxis = d3.svg.axis().scale(y1).tickValues([0,yMin,yMax]).orient("left").tickFormat(window.myFormatter);
+  // move polyline
+  // console.log(d3.select('#'+id)[0])
+
+  var chart= d3.select('#'+id)
+    
+  chart.select('polyline')
+    .transition().delay(delayTime)
+    .attr("points", function(){return convertCoord(zip([xmArray,ymArray]))} )
+
+  chart.select('#yAxis')
+       .transition().delay(delayTime)
+       .call(yAxis)
+
+  // var ax = d3.select('#grapcharts .AxisLayer')[0][i]
+  }
 
 function cChart(id){
   console.log('compareChart in work!')
@@ -623,6 +667,15 @@ function cChart(id){
   }
 
   compSal(salComp,sample.salary2014,moscow.salary2014)
+  }
+
+function updateGraph(id){
+
+      var sample = window.Lookup[id]
+      
+      var h = 80;
+      updateLinechart('lPop',[sample.salary2012 ,sample.salary2013 ,sample.salary2014],[2012,2013,2014],window.lgWidth,h, 50 )
+      updateLinechart('lSal',[sample.pop2002 ,sample.pop2010 ,sample.pop2012 ,sample.pop2013 ,sample.pop2014 ],[2002,2010,2012,2013,2014],window.lgWidth,h,50 )
 
 
 }
@@ -643,6 +696,22 @@ function getData(){
     });
           
 }
+
+// UTIL FUNCTIONS
+function convertCoord(d){
+      var str="";
+        for(var pti=0;pti<d.length;pti++){
+            str=str+d[pti][0]+","+d[pti][1]+" ";
+            }
+            return str;
+  }
+
+  function zip(arrays) {
+      return arrays[0].map(function(_,i){
+          return arrays.map(function(array){return array[i]})
+      });
+  }
+
     
               
 
