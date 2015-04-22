@@ -20,6 +20,15 @@ myFloatFormatter2 = ru.numberFormat(',.2f')
 var colors = {'pop2014': 'red', 'salary2014':'purple', 'density2014':'rgb(0, 55, 153)'}
 var quantDict = {'pop2014':'Население, тыс. чел.','density2014':'Плотность, количество человек на кв. км.', 'salary2014':'Средняя зарплата, руб.'};
 
+
+// links to map
+var maps = {'Северное Тушино': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/0583de02-e822-11e4-94a9-0e4fddd5de28/viz.json', 'coordinates':[55.864266,37.427031,13]},
+          'Щукино': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/4444049a-e823-11e4-ae67-0e853d047bba/viz.json', 'coordinates':[55.8016,37.4744,13]},
+          'Пресненский': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/2d628f02-e824-11e4-8d04-0e018d66dc29/viz.json', 'coordinates':[55.76032,37.561985,13]},
+          'Академический': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/2373319e-e825-11e4-b1d1-0e4fddd5de28/viz.json', 'coordinates':[55.68868, 37.577669, 13]},
+          'Выхино-Жулебино': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/b237159e-e825-11e4-80e1-0e9d821ea90d/viz.json', 'coordinates':[55.698634,37.825995,13]}
+  }
+
 Lookup = {};
 
 function maxRounded(mvalue){
@@ -100,7 +109,8 @@ function graphCharts(rayonId, datum){
 }
 
 function barChart(datum){
-    var data = datum
+    var data =[]
+    datum.forEach(function(d){if(d.name1!='Москва'){data.push(d)}})
 
     var margin = {top: 30, right: 10, bottom: 30, left: 30};
 
@@ -227,12 +237,26 @@ function createMap(mapId, mapLink){
         .done(function(vis, layers) {
           
           // here goes all logis
-            
-          })
+          var sublayer = layers[1].getSubLayer(1);
+          sublayer.on("featureClick",function(e, latlng, pos, data, layerIndex){mapClick(e, latlng, pos, data, layerIndex)})
+        })
         .error(function(err) {
           console.log(err);
         });
-      } 
+      
+
+      }
+
+function mapClick(e, latlng, pos, data, layerIndex) {
+          var id= data.namenew ;
+          
+          d3.select('#rayonId').text('район '+id)
+          d3.select('#RayonAnalysis').text('Сравнительный анализ, район '+id)
+        
+          d3.select(map2.firstChild).remove()
+          localMap('map2',window.maps[id]['link'], window.maps[id]['coordinates']);
+
+          }
 
 function localMap(mapId, mapLink, lonlatzoom){
         cartodb.createVis(mapId, mapLink, {
@@ -349,7 +373,7 @@ function cChart(id){
   var moscow = [window.Lookup['Москва']][0]
 
   // SVG
-  var margin = {top: 20, right: 25, bottom: 20, left: 25};
+  var margin = {top: 20, right: 25, bottom: 20, left: 15};
 
   var width = 346 - margin.left - margin.right,
       height = 304 - margin.top - margin.bottom;
@@ -383,47 +407,60 @@ function cChart(id){
 
   
     g.append('g').attr('id','brs1')
-    g.append('g').attr('id','brs2').attr("transform", "translate(60,0)")
+    g.append('g').attr('id','brs2').attr("transform", "translate(53,0)")
     var brs1 = g.select('#brs1')
     var brs2 = g.select('#brs2')
 
-    function stackBar(g,m){
+    function stackBar(g,m, textRight, cls){
       // generate stacked barchart with percent labels
-      var types = ['private','msra','msr','uc']
+      // var types = ['private','msra','msr','uc']
+      if (textRight==true){
+        x1=0
+        x2=25
+        anchor = 'start'
+        }
+      else {
+        x1=30
+        x2 = 25
+        anchor='end'
+      }
       h = 0
       for (var i=0; i<4; i++){
           h+=y(m[i])
           
           g.append('rect')
-          .attr('class',types[i])
+          .attr('class',cls)
+          .attr("x", x1)
           .attr("width", '20px')
           .attr("height", y(m[i+1]))
           .attr('y', h);
 
         }
       
+
       h = 0
       for (var i=0; i<4; i++){
           h+=y(m[i])
           if (m[i+1]!=0){
           g.append('text')
           .attr('class','bLabel')
-          .attr("x", '25px')
+          .attr("x", x2)
           .attr('y', function(d){if((h+8)<=height){return h+8} else {return height}})
-          .text(window.myFloatFormatter(m[i+1])+' %');
+          .text(window.myFloatFormatter(m[i+1])+' %')
+          .attr('text-anchor',anchor);
           }
         }
       }
   
-    stackBar(brs1,m)
-    stackBar(brs2,d)
+    stackBar(brs1,m,false,'msk')
+    stackBar(brs2,d, true,'ryn')
     }
   
   htypeBars(htype,sample,moscow)
 
   var sal = mWindow.append('g')
                      .attr('id','salComp')
-                     .attr("transform", "translate(120,134)")
+                     .attr("transform", "translate(130,0)")
 
   function compPrice(g,s,m){
     sA = [s.price1room, s.price2rooms, s.price3rooms]
@@ -450,7 +487,7 @@ function cChart(id){
      .attr('class','bars')
      .attr("transform", "translate(0,40)")
     
-     var yP = 75
+     var yP = 65
      var labels = ['1 комната','2 комнаты','3 комнаты']
 
     for (var i = 0; i < 3; i++) {
@@ -469,19 +506,6 @@ function cChart(id){
           .attr('width','20')
           .attr('height',y(mA[i]))
 
-      // bars.append('text')
-      //     .attr('class','PriceLabel')
-      //     .attr('x',i*(60) +15 +20)
-      //     .attr('y',(yP -y(sA[i]) - 5))
-      //     .attr('text-anchor','end')
-      //     .text(window.myFormatter(sA[i]))
-
-      // bars.append('text')
-      //     .attr('class','PriceLabel')
-      //     .attr('x',i*(60) +23 +15 )
-      //     .attr('y',(yP -y(mA[i]) - 5))
-      //     .attr('text-anchor','start')
-      //     .text(window.myFormatter(mA[i]))
 
       bars.append('text')
           .attr('class','RoomLabel')
@@ -499,39 +523,105 @@ function cChart(id){
               
     axisLayer.append('g')
       .attr("class", "axis")
-      .attr("transform", "translate(5,48)")
+      .attr("transform", "translate(5,38)")
       .call(yAxis);
     
 
-    // R Square
+    
 
   }
+
   compPrice(sal,sample,moscow)
 
   var popComp = mWindow.append('g')
                      .attr('id','popComp')
-                     .attr("transform", "translate(120,0)")
+                     .attr("transform", "translate(130,223)")
+
 
   function compPop(g, s,m){
+    console.log(s)
+    console.log(m)
     g.append('text')
      .text('Население района, %')
      .attr('class','chTitle')
      .attr('y','11')
+
+    g.append('rect')
+    .attr('class','msk')
+    .attr('y','20')
+    .attr('height','20')
+    .attr('width','180')
+
+    var percent = d3.max([180*(s / m),4])
+
+    g.append('rect')
+    .attr('class','ryn')
+    .attr('y','20')
+    .attr('height','20')
+    .attr('width',percent)
+
+    g.append('text')
+    .attr('class','bLabel')
+    .attr('y',33)
+    .attr('x',percent+5)
+    .text(window.myFloatFormatter2(180*(s / m)) + ' %')
+    .attr('text-anchor','start');
+
+    g.append('text')
+    .attr('class','bLabel')
+    .attr('y','33')
+    .attr('x',177)
+    .text('100 %')
+    .attr('text-anchor','end');
     
   }
   compPop(popComp,sample.pop2014,moscow.pop2014)
 
   var salComp = mWindow.append('g')
                      .attr('id','salComp')
-                     .attr("transform", "translate(120,60)")
+                     .attr("transform", "translate(130,150)")
 
   function compSal(g, s,m){
+    m = 60000
+    
+    var x = d3.scale.linear().domain([0, d3.max([s,m])]).range([0,180])
+
     g.append('text')
      .text('Средняя зарплата, руб.')
      .attr('class','chTitle')
      .attr('y','11')
-    
+
+    g.append('rect')
+        .attr('class','msk')
+        .attr('x',0 )
+        .attr('y',40)
+        .attr('width',x(m) )
+        .attr('height',20 )
+
+    g.append('rect')
+        .attr('class','ryn')
+        .attr('x',0 )
+        .attr('y',20)
+        .attr('width',x(s) )
+        .attr('height',20 )
+
+    g.append('text')
+     .attr('class','wbLabel')
+     .attr('x',x(s)-5 )
+     .attr('y',33)
+     .text(window.myFormatter(s))
+     .attr('text-anchor','end');
+
+     g.append('text')
+     .attr('class','bLabel')
+     .attr('x',x(m)-5 )
+     .attr('y',53)
+     .text(window.myFormatter(m))
+     .attr('text-anchor','end');
+
+        
   }
+
   compSal(salComp,sample.salary2014,moscow.salary2014)
 
 
@@ -544,7 +634,7 @@ function getData(){
     d3.json("http://philip.cartodb.com/api/v2/sql?q=SELECT * FROM mosrayons &format=geojson&dp=5",  function(error, d){
       dataset = d.features.map(function(d){return d.properties})
       createMap('map1','https://rilosmaps.cartodb.com/u/philip/api/v2/viz/f9cbd828-e761-11e4-9ba6-0e9d821ea90d/viz.json')
-      localMap('map2','http://rilosmaps.cartodb.com/api/v2/viz/1d6f5f4c-cd6e-11e4-b9ec-0e018d66dc29/viz.json', [56.965766, 40.99548, 13])
+      localMap('map2',window.maps['Академический']['link'], window.maps['Академический']['coordinates'])
       barChart(dataset)
       graphCharts('Академический',dataset)
       cChart('Академический')
