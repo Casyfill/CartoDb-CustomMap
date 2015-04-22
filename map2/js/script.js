@@ -17,7 +17,7 @@ d3.format = ru.numberFormat;
 myFormatter = ru.numberFormat(',.0f')
 myFloatFormatter = ru.numberFormat(',.1f')
 myFloatFormatter2 = ru.numberFormat(',.2f')
-var colors = {'pop2014': 'red', 'salary2014':'purple', 'density2014':'rgb(0, 55, 153)'}
+var colors = {'pop2014': 'red', 'salary2014':'rgb(0, 55, 153)', 'density2014':'darkblue'}
 var quantDict = {'pop2014':'Население, тыс. чел.','density2014':'Плотность, количество человек на кв. км.', 'salary2014':'Средняя зарплата, руб.'};
 
 
@@ -26,11 +26,11 @@ var lgHeigth
 var lYs=[]
 
 // links to map
-var maps = {'Северное Тушино': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/0583de02-e822-11e4-94a9-0e4fddd5de28/viz.json', 'coordinates':[55.864266,37.427031,13]},
-          'Щукино': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/4444049a-e823-11e4-ae67-0e853d047bba/viz.json', 'coordinates':[55.8016,37.4744,13]},
-          'Пресненский': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/2d628f02-e824-11e4-8d04-0e018d66dc29/viz.json', 'coordinates':[55.76032,37.561985,13]},
-          'Академический': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/2373319e-e825-11e4-b1d1-0e4fddd5de28/viz.json', 'coordinates':[55.68868, 37.577669, 13]},
-          'Выхино-Жулебино': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/b237159e-e825-11e4-80e1-0e9d821ea90d/viz.json', 'coordinates':[55.698634,37.825995,13]}
+var maps = {'Северное Тушино': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/0583de02-e822-11e4-94a9-0e4fddd5de28/viz.json', 'coordinates':[55.864266,37.427031,12]},
+          'Щукино': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/4444049a-e823-11e4-ae67-0e853d047bba/viz.json', 'coordinates':[55.8016,37.4744,12]},
+          'Пресненский': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/2d628f02-e824-11e4-8d04-0e018d66dc29/viz.json', 'coordinates':[55.76032,37.561985,12]},
+          'Академический': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/2373319e-e825-11e4-b1d1-0e4fddd5de28/viz.json', 'coordinates':[55.68868, 37.577669, 12]},
+          'Выхино-Жулебино': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/b237159e-e825-11e4-80e1-0e9d821ea90d/viz.json', 'coordinates':[55.698634,37.825995,12]}
   }
 
 Lookup = {};
@@ -511,9 +511,10 @@ function cChart(id){
     mA = [m.price1room, m.price2rooms, m.price3rooms]
     
     sMax = d3.max(sA.concat(mA))
-
-    var y = d3.scale.linear().domain([0, sMax]).range([0,height/4])
-    var y1 = d3.scale.linear().domain([0, sMax]).range([height/4,0])
+    var hh = 50
+    var yP = hh
+    var y = d3.scale.linear().domain([0, sMax]).range([0,hh])
+    var y1 = d3.scale.linear().domain([0, sMax]).range([hh,0])
 
 
     // title
@@ -531,7 +532,7 @@ function cChart(id){
      .attr('class','bars')
      .attr("transform", "translate(0,40)")
     
-     var yP = 65
+     
      var labels = ['1 комната','2 комнаты','3 комнаты']
 
     for (var i = 0; i < 3; i++) {
@@ -567,7 +568,7 @@ function cChart(id){
               
     axisLayer.append('g')
       .attr("class", "axis")
-      .attr("transform", "translate(5,38)")
+      .attr("transform", "translate(5,"+(yP-11)+")")
       .call(yAxis);
     
 
@@ -579,7 +580,7 @@ function cChart(id){
 
   var popComp = mWindow.append('g')
                      .attr('id','popComp')
-                     .attr("transform", "translate(130,223)")
+                     .attr("transform", "translate(130,190)")
 
 
   function compPop(g, s,m){
@@ -623,7 +624,7 @@ function cChart(id){
 
   var salComp = mWindow.append('g')
                      .attr('id','salComp')
-                     .attr("transform", "translate(130,150)")
+                     .attr("transform", "translate(130,120)")
 
   function compSal(g, s,m){
     m = 60000

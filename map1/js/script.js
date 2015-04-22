@@ -84,7 +84,9 @@ function createMap(mapId, mapLink){
             var area= d3.select('.area')
             function updateRadar(name,area){
 
-                  
+                    d3.json("http://philip.cartodb.com/api/v2/sql?q=SELECT * FROM topdatum WHERE status IS true &format=geojson&dp=5",  function(error, d){
+                    datum = d.features.map(function(d){return d.properties})
+
                     
                     var sample = window.radarLookup[name]
 
