@@ -128,7 +128,7 @@ font-weight:bold;
 .graphlines {
 	fill:none;
 	stroke:rgb(81, 128, 200);
-	stroke-width:2
+	stroke-width:3
 
 }
 
@@ -388,3 +388,7 @@ h6 {
 	font: 12px sans-serif;
 	fill:black;
 }
+
+.graph polygon.linefill{
+	fill: url(#gradient)
+} 

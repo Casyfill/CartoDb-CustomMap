@@ -90,24 +90,50 @@ function graphCharts(rayonId, datum){
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom);
 
+  // gradient
+  var gColor = "rgb(41, 100, 255)"
+  var gradient = svg.append("svg:defs")
+  .append("svg:linearGradient")
+    .attr("id", "gradient")
+    .attr("y1", "0%")
+    .attr("y2", "100%")
+    .attr("x1", "0%")
+    .attr("x2", "0%")
+    .attr("spreadMethod", "pad");
+
+  gradient.append("svg:stop")
+      .attr("offset", "0%")
+      .attr("stop-color", gColor)
+      .attr("stop-opacity", 1);
+
+  gradient.append("svg:stop")
+      .attr("offset", "40%")
+      .attr("stop-color", gColor)
+      .attr("stop-opacity", 0.4);
+
+  gradient.append("svg:stop")
+      .attr("offset", "100%")
+      .attr("stop-color", gColor)
+      .attr("stop-opacity", 0);
+
   var charts = svg.append('g')
                   .attr('id','grapcharts')
                   .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
   
-  function splitRangeEndOffset(range,num, offset){
-      // splits range into chinks without
-      var sh = (range[1]-range[0])/num
+  // function splitRangeEndOffset(range,num, offset){
+  //     // splits range into chinks without
+  //     var sh = (range[1]-range[0])/num
       
-      r = [];
-      for (i=0, len = num; i<len; i++){
-      s = range[0] +(sh)*i
-      e = s + sh-offset
-      r.push([s,e])
-      }
+  //     r = [];
+  //     for (i=0, len = num; i<len; i++){
+  //     s = range[0] +(sh)*i
+  //     e = s + sh-offset
+  //     r.push([s,e])
+  //     }
 
-      return r
-    }
+  //     return r
+  //   }
 
   // console.log(splitRange([0,8],2))
 
@@ -351,11 +377,22 @@ function linechart(g, yArray, xArray, width, height, t, title){
                .attr('class','graph')
                .attr("transform", "translate(0,"+hd+")")
 
-
   
+  
+  // generate polygon coord
+  var PolygonXarray = [xmArray[0]].concat(xmArray).concat([xmArray[xmArray.length - 1]])
+  var PolygonYarray = [height].concat(ymArray).concat([height])
+  // draw polygon
+  graph.append('polygon')
+    .attr('class','linefill')
+    .attr('points',function(){return convertCoord(zip([PolygonXarray,PolygonYarray]))} )
+
+
+  // line
   graph.append('polyline')
    .attr("points", function(){return convertCoord(zip([xmArray,ymArray]))} )
    .attr('class','graphlines')
+
 
   var xAxis = d3.svg.axis().scale(x1).orient("bottom").tickValues([2000,2005,2010,2015]);
   var yAxis = d3.svg.axis().scale(y1).tickValues([0,yMin,yMax]).orient("left").tickFormat(window.myFormatter);
@@ -711,12 +748,21 @@ function updateGraph(id){
         // console.log(d3.select('#'+id)[0])
 
         var chart= d3.select('#'+id)
-          
+
+        // update line
         chart.select('polyline')
           .transition().delay(delayTime)
           .attr("points", function(){return convertCoord(zip([xmArray,ymArray]))} )
 
-        chart.select('#yAxis')
+      // update polygon
+      var PolygonXarray = [xmArray[0]].concat(xmArray).concat([xmArray[xmArray.length - 1]])
+      var PolygonYarray = [height].concat(ymArray).concat([height])
+      
+      chart.select('.linefill')
+          .transition().delay(delayTime)
+          .attr('points',function(){return convertCoord(zip([PolygonXarray,PolygonYarray]))} )
+        
+      chart.select('#yAxis')
              .transition().delay(delayTime)
              .call(yAxis)
 
