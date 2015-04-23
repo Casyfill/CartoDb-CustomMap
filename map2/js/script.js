@@ -23,6 +23,8 @@ var quantDict = {'pop2014':'Население, тыс. чел.','density2014':'
 
 var lgWidth
 var lgHeigth
+var cHeight
+var cWidth
 var lYs=[]
 
 // links to map
@@ -272,6 +274,7 @@ function mapClick(e, latlng, pos, data, layerIndex) {
           localMap('map2',window.maps[id]['link'], window.maps[id]['coordinates']);
 
           updateGraph(id)
+          updateChect(id)
 
           }
 
@@ -377,40 +380,6 @@ function linechart(g, yArray, xArray, width, height, t, title){
   } 
    
 
-function updateLinechart(id, yArray, xArray, width, height, delayTime){
-  
-  // get max's
-  var yMax = d3.max(yArray),
-      yMin = d3.min(yArray);
-
-
-  // two axises
-  var y1 = d3.scale.linear().domain([0, yMax]).range([height,0]),
-      x1 = d3.scale.linear().domain([2000, 2015]).range([0,width]);
-
-
-  
-  // scale arrays
-  var xmArray = xArray.map(function(d){return x1(d)}),
-      ymArray = yArray.map(function(d){return y1(d)});
-
-  var yAxis = d3.svg.axis().scale(y1).tickValues([0,yMin,yMax]).orient("left").tickFormat(window.myFormatter);
-  // move polyline
-  // console.log(d3.select('#'+id)[0])
-
-  var chart= d3.select('#'+id)
-    
-  chart.select('polyline')
-    .transition().delay(delayTime)
-    .attr("points", function(){return convertCoord(zip([xmArray,ymArray]))} )
-
-  chart.select('#yAxis')
-       .transition().delay(delayTime)
-       .call(yAxis)
-
-  // var ax = d3.select('#grapcharts .AxisLayer')[0][i]
-  }
-
 function cChart(id){
   console.log('compareChart in work!')
   var sample = [window.Lookup[id]][0]
@@ -421,6 +390,9 @@ function cChart(id){
 
   var width = 346 - margin.left - margin.right,
       height = 304 - margin.top - margin.bottom;
+
+  window.cWidth = width
+  window.cHeight = height
 
   var svg = d3.select("#compareChart")
       .append("svg")
@@ -435,19 +407,21 @@ function cChart(id){
                      .attr('id','htype')
 
   function htypeBars(g,sample,moscow){
-    var y = d3.scale.linear().domain([0, 100]).range([0,height])
+  
 
-    var d = [0,
-             sample.privatehousingpercent,
+    var d = [sample.privatehousingpercent,
              sample.multistoreyresadmpercentt,
              sample.multistoreyrespercent,
              sample.underconstructionpercent]
     
-    var m = [0,
-             moscow.privatehousingpercent,
+    var m = [moscow.privatehousingpercent,
              moscow.multistoreyresadmpercentt,
              moscow.multistoreyrespercent,
              moscow.underconstructionpercent]
+
+    
+    
+
 
   
     g.append('g').attr('id','brs1')
@@ -455,9 +429,12 @@ function cChart(id){
     var brs1 = g.select('#brs1')
     var brs2 = g.select('#brs2')
 
-    function stackBar(g,m, textRight, cls){
-      // generate stacked barchart with percent labels
-      // var types = ['private','msra','msr','uc']
+
+    function stackBar2(g,m,textRight,cls){
+      summ=0
+      m.forEach(function(d){summ+=d})
+      var y = d3.scale.linear().domain([0, summ]).range([0,height])
+      
       if (textRight==true){
         x1=0
         x2=25
@@ -465,56 +442,54 @@ function cChart(id){
         }
       else {
         x1=30
-        x2 = 25
+        x2 = -5
         anchor='end'
       }
-      h = 0
-      for (var i=0; i<4; i++){
-          h+=y(m[i])
-          
-          g.append('rect')
-          .attr('class',cls)
-          .attr("x", x1)
-          .attr("width", '20px')
-          .attr("height", y(m[i+1]))
-          .attr('y', h);
-
-        }
+      var h=0;
       
+      m = m.map(function(d){return [h, h+=d]})
+      
+      var stack = g.append('g')
+                  .attr('class','stack')
+                  .attr("transform", "translate("+x1+",0)")
+      
+      stack.selectAll('rect')
+      .data(m)
+      .enter()
+      .append('rect')
+      .attr('class',cls)
+      .attr("width", '20px')
+      .attr('y',function(d){return y(d[0])})
+      .attr('height',function(d){return y(d[1]-d[0])})
 
-      h = 0
-      for (var i=0; i<4; i++){
-          h+=y(m[i])
-          if (m[i+1]!=0){
-          g.append('text')
-          .attr('class','bLabel')
-          .attr("x", x2)
-          .attr('y', function(d){if((h+8)<=height){return h+8} else {return height}})
-          .text(window.myFloatFormatter(m[i+1])+' %')
-          .attr('text-anchor',anchor);
-          }
-        }
-      }
-  
-    stackBar(brs1,m,false,'msk')
-    stackBar(brs2,d, true,'ryn')
+      stack.selectAll('text')
+      .data(m)
+      .enter()
+      .append('text')
+      .attr('class','bLabel')
+      .attr('x',x2)
+      .attr('y',function(d){if(y(d[0])+8<=height){return y(d[0])+8} else {return height}})
+      .text(function(d){if (d[1]-d[0]>3){return window.myFloatFormatter(d[1]-d[0])+' %'} else {return ''}})
+      .attr('text-anchor',anchor);
+
+    }
+    stackBar2(brs1,m,false,'msk')
+    stackBar2(brs2,d, true,'ryn')
     }
   
   htypeBars(htype,sample,moscow)
 
   var sal = mWindow.append('g')
-                     .attr('id','salComp')
+                     .attr('id','priceComp')
                      .attr("transform", "translate(130,0)")
 
   function compPrice(g,s,m){
-    sA = [s.price1room, s.price2rooms, s.price3rooms]
-    mA = [m.price1room, m.price2rooms, m.price3rooms]
+    datum = [[s.price1room,m.price1room],[s.price2rooms,m.price2rooms],[s.price3rooms,m.price3rooms]]
+    var height = 50
     
-    sMax = d3.max(sA.concat(mA))
-    var hh = 50
-    var yP = hh
-    var y = d3.scale.linear().domain([0, sMax]).range([0,hh])
-    var y1 = d3.scale.linear().domain([0, sMax]).range([hh,0])
+    sMax = d3.max([s.price1room,m.price1room,s.price2rooms,m.price2rooms,s.price3rooms,m.price3rooms])
+    var y = d3.scale.linear().domain([0, sMax]).range([0,height])
+    var y1 = d3.scale.linear().domain([0, sMax]).range([height,0])
 
 
     // title
@@ -527,39 +502,41 @@ function cChart(id){
      .attr('y','25')
      .attr('x','0')
     
+    var labels = ['1 комната','2 комнаты','3 комнаты']
     // Bars
-    var bars = g.append('g')
-     .attr('class','bars')
+    g.append('g')
+     .attr('id','barsG')
      .attr("transform", "translate(0,40)")
+
+    var bars = g.select('#barsG')
+     .selectAll('g')
+     .data(datum)
+     .enter()
+     .append('g')
+     .attr('class','bars')
+     .attr("transform", function(d,i){return "translate("+(15+i*60)+",0)"})
+
+    bars.append('rect')
+      .attr('class','sRect')
+      .attr('width','20')
+      .attr('x',0)
+      .attr('y',function(d){return (height - y(d[0]))})
+      .attr('height',function(d){return y(d[0])}) 
     
+    bars.append('rect')
+      .attr('class','mRect')
+      .attr('width','20')
+      .attr('x',23)
+      .attr('y',function(d){return (height-y(d[1]))})
+      .attr('height',function(d){return y(d[1])}) 
+    
+    bars.append('text')
+      .attr('class','RoomLabel')
+      .attr('text-anchor','middle')
+      .attr('x',21.5)
+      .attr('y',(height +15))
+      .text(function(d,i){return labels[i]})
      
-     var labels = ['1 комната','2 комнаты','3 комнаты']
-
-    for (var i = 0; i < 3; i++) {
-      console.log()
-      bars.append('rect')
-          .attr('class','sRect')
-          .attr('x',i*60 +15)
-          .attr('y',yP-y(sA[i]))
-          .attr('width','20')
-          .attr('height',y(sA[i])) 
-
-      bars.append('rect')
-          .attr('class','mRect')
-          .attr('x',i*60+23 +15)
-          .attr('y',yP-y(mA[i]))
-          .attr('width','20')
-          .attr('height',y(mA[i]))
-
-
-      bars.append('text')
-          .attr('class','RoomLabel')
-          .attr('x',i*(60)+21.5 +15 )
-          .attr('y',(yP +15))
-          .attr('text-anchor','middle')
-          .text(labels[i])
-      
-    };
     
     var yAxis = d3.svg.axis().scale(y1).ticks(3).orient("left").tickFormat(window.myFormatter);
 
@@ -568,7 +545,7 @@ function cChart(id){
               
     axisLayer.append('g')
       .attr("class", "axis")
-      .attr("transform", "translate(5,"+(yP-11)+")")
+      .attr("transform", "translate(5,"+(height-11)+")")
       .call(yAxis);
     
 
@@ -584,6 +561,7 @@ function cChart(id){
 
 
   function compPop(g, s,m){
+    // m is hardcoded?
     console.log(s)
     console.log(m)
     g.append('text')
@@ -607,6 +585,7 @@ function cChart(id){
 
     g.append('text')
     .attr('class','bLabel')
+    .attr('id','rPop')
     .attr('y',33)
     .attr('x',percent+5)
     .text(window.myFloatFormatter2(180*(s / m)) + ' %')
@@ -627,7 +606,6 @@ function cChart(id){
                      .attr("transform", "translate(130,120)")
 
   function compSal(g, s,m){
-    m = 60000
     
     var x = d3.scale.linear().domain([0, d3.max([s,m])]).range([0,180])
 
@@ -652,6 +630,7 @@ function cChart(id){
 
     g.append('text')
      .attr('class','wbLabel')
+     .attr('id','rSal')
      .attr('x',x(s)-5 )
      .attr('y',33)
      .text(window.myFormatter(s))
@@ -659,6 +638,7 @@ function cChart(id){
 
      g.append('text')
      .attr('class','bLabel')
+     .attr('id','mSal')
      .attr('x',x(m)-5 )
      .attr('y',53)
      .text(window.myFormatter(m))
@@ -671,20 +651,170 @@ function cChart(id){
   }
 
 function updateGraph(id){
+      function updateLinechart(id, yArray, xArray, width, height, delayTime){
+        
+        // get max's
+        var yMax = d3.max(yArray),
+            yMin = d3.min(yArray);
+
+
+        // two axises
+        var y1 = d3.scale.linear().domain([0, yMax]).range([height,0]),
+            x1 = d3.scale.linear().domain([2000, 2015]).range([0,width]);
+
+
+        
+        // scale arrays
+        var xmArray = xArray.map(function(d){return x1(d)}),
+            ymArray = yArray.map(function(d){return y1(d)});
+
+        var yAxis = d3.svg.axis().scale(y1).tickValues([0,yMin,yMax]).orient("left").tickFormat(window.myFormatter);
+        // move polyline
+        // console.log(d3.select('#'+id)[0])
+
+        var chart= d3.select('#'+id)
+          
+        chart.select('polyline')
+          .transition().delay(delayTime)
+          .attr("points", function(){return convertCoord(zip([xmArray,ymArray]))} )
+
+        chart.select('#yAxis')
+             .transition().delay(delayTime)
+             .call(yAxis)
+
+        // var ax = d3.select('#grapcharts .AxisLayer')[0][i]
+        }
 
       var sample = window.Lookup[id]
       
       var h = 80;
-      updateLinechart('lPop',[sample.salary2012 ,sample.salary2013 ,sample.salary2014],[2012,2013,2014],window.lgWidth,h, 50 )
-      updateLinechart('lSal',[sample.pop2002 ,sample.pop2010 ,sample.pop2012 ,sample.pop2013 ,sample.pop2014 ],[2002,2010,2012,2013,2014],window.lgWidth,h,50 )
+      updateLinechart('lSal',[sample.salary2012 ,sample.salary2013 ,sample.salary2014],[2012,2013,2014],window.lgWidth,h, 50 )
+      updateLinechart('lPop',[sample.pop2002 ,sample.pop2010 ,sample.pop2012 ,sample.pop2013 ,sample.pop2014 ],[2002,2010,2012,2013,2014],window.lgWidth,h,50 )
+  }
+
+function updateChect(id){
+  // update comparison chart
+  var sample = [window.Lookup[id]][0]
+  var moscow = [window.Lookup['Москва']][0]
+  
+
+  // update housing tyoe
+  function updateHtype(id, r){ 
+    var height = window.cHeight 
+    
+
+    var m = [r.privatehousingpercent,
+            r.multistoreyresadmpercentt,
+            r.multistoreyrespercent,
+            r.underconstructionpercent]
+
+    summ=0
+    m.forEach(function(d){summ+=d})
+    var y = d3.scale.linear().domain([0, summ]).range([0,height])
+
+    h = 0
+    m = m.map(function(d){return [h, h+=d]})
+
+    var stack = d3.select("#brs2 .stack")
+
+    stack.selectAll('rect')
+        .data(m)
+        .transition().delay(50)
+        .attr('y',function(d){return y(d[0])})
+        .attr('height',function(d){return y(d[1]-d[0])})
+
+    stack.selectAll('text')
+        .data(m)
+        .transition().delay(50)
+        .attr('y',function(d){if(y(d[0])+8<=height){return y(d[0])+8} else {return height}})
+        .text(function(d){if (d[1]-d[0]>3){return window.myFloatFormatter(d[1]-d[0])+' %'} else {return ''}})
+          
+          
+    }
+
+  function updatePop( s,m){
+    var percent = d3.max([180*(s / m)+2,3])
+    console.log(s)
+    console.log(s / m)
+
+    d3.select('#popComp .ryn')
+      .transition().delay(50)
+      .attr('width', percent)
+
+    d3.selectAll('#popComp #rPop')
+      .transition().delay(50)
+      .attr('x', percent+5)
+      .text(window.myFloatFormatter2(180*(s / m)) + ' %')
+  }
+
+  function updateSal(s,m){
+    var max = d3.max([s,m])
+
+    var x = d3.scale.linear().domain([0, d3.max([s,m])]).range([0,180])
 
 
+    d3.select('#salComp .msk ')
+        .transition().delay(50)
+        .attr('width',x(m) )
+
+    d3.select('#salComp .ryn ')
+        .transition().delay(50)
+        .attr('width',x(s) )
+        
+
+    d3.select('#salComp #rSal ')
+     .transition().delay(50)
+     .attr('x',x(s)-5 )
+     .text(window.myFormatter(s))
+  
+    d3.select('#salComp #mSal ')
+     .transition().delay(50)
+     .attr('x',x(m)-5 )
+     .text(window.myFormatter(m))
+
+    }
+  
+
+  function updatePrice(s,m){
+    newDatum = [[s.price1room,m.price1room],[s.price2rooms,m.price2rooms],[s.price3rooms,m.price3rooms]]
+    sMax = d3.max([s.price3rooms,m.price3rooms])
+    console.log('3room'+[s.price3rooms,m.price3rooms])
+    console.log('max:'+sMax)
+    
+    var height =50
+    
+    var y = d3.scale.linear().domain([0, sMax]).range([0,height])
+    var y1 = d3.scale.linear().domain([0, sMax]).range([height,0])
+    console.log(y1(datum[2][0]),y1(datum[2][1]))
+    var bars = d3.selectAll('#barsG .bars')
+
+    bars.data(newDatum)
+    
+    bars.select('.sRect') 
+    .transition().delay(50)
+    .attr('y',function(d){return (height - y(d[0]))})
+    .attr('height',function(d){return y(d[0])}) 
+
+    bars.select('.mRect')
+    .transition().delay(50)
+    .attr('y',function(d){return (height - y(d[1]))})
+    .attr('height',function(d){return y(d[1])}) 
+
+    var yAxis = d3.svg.axis().scale(y1).ticks(3).orient("left").tickFormat(window.myFormatter);
+    d3.select('#priceComp .axis')
+             .transition().delay(50)
+             .call(yAxis)
+
+
+  }
+  updateHtype(id, sample)
+  updatePop(sample.pop2014,moscow.pop2014)
+  updateSal(sample.salary2014,moscow.salary2014)
+  updatePrice(sample,moscow)
 }
 
 function getData(){
-  
-    
-        
+     // get data and produce all viz
     d3.json("http://philip.cartodb.com/api/v2/sql?q=SELECT * FROM mosrayons &format=geojson&dp=5",  function(error, d){
       dataset = d.features.map(function(d){return d.properties})
       createMap('map1','https://rilosmaps.cartodb.com/u/philip/api/v2/viz/f9cbd828-e761-11e4-9ba6-0e9d821ea90d/viz.json')
@@ -700,6 +830,7 @@ function getData(){
 
 // UTIL FUNCTIONS
 function convertCoord(d){
+  // produce string for polylines and polygons
       var str="";
         for(var pti=0;pti<d.length;pti++){
             str=str+d[pti][0]+","+d[pti][1]+" ";
@@ -708,6 +839,7 @@ function convertCoord(d){
   }
 
   function zip(arrays) {
+    // zip two arrays into array of pairs
       return arrays[0].map(function(_,i){
           return arrays.map(function(array){return array[i]})
       });
