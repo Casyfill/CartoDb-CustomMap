@@ -469,7 +469,7 @@ function cChart(id){
       .attr('class','bLabel')
       .attr('x',x2)
       .attr('y',function(d){if(y(d[0])+8<=height){return y(d[0])+8} else {return height}})
-      .text(function(d){if (d[1]-d[0]>3){return window.myFloatFormatter(d[1]-d[0])+' %'} else {return ''}})
+      .text(function(d){if (d[1]-d[0]>1.5){return window.myFloatFormatter(d[1]-d[0])+' %'} else {return ''}})
       .attr('text-anchor',anchor);
 
     }
@@ -648,7 +648,45 @@ function cChart(id){
   }
 
   compSal(salComp,sample.salary2014,moscow.salary2014)
+  
+  // legends
+  var lgnd = mWindow.append('g')
+                     .attr('id','legend')
+                     .attr("transform", "translate(130,248)")
+  
+  function legend(g){
+    var data =[['msk','Москва',],['ryn',' район Академический']]
+    
+    var rows = g.selectAll('g')
+                .data(data)
+                .enter()
+                .append('g')
+                .attr('class','row')
+                .attr("transform", function(d,i){return "translate("+i*60 +",0)"})
+
+    rows.append('rect')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width',15)
+        .attr('height',15)
+        .attr('class', function(d){return d[0]})
+
+    rows.append('text')
+        .attr('x', 20)
+        .attr('y', 10)
+        .attr('class', 'bLabel')
+        .attr('id', function(d){return d[0]})
+        .text(function(d){return d[1]})
+
+
+
+
+    }
+
+  legend(lgnd)
   }
+
+  
 
 function updateGraph(id){
       function updateLinechart(id, yArray, xArray, width, height, delayTime){
@@ -727,7 +765,7 @@ function updateChect(id){
         .data(m)
         .transition().delay(50)
         .attr('y',function(d){if(y(d[0])+8<=height){return y(d[0])+8} else {return height}})
-        .text(function(d){if (d[1]-d[0]>3){return window.myFloatFormatter(d[1]-d[0])+' %'} else {return ''}})
+        .text(function(d){if (d[1]-d[0]>1.5){return window.myFloatFormatter(d[1]-d[0])+' %'} else {return ''}})
           
           
     }
@@ -804,13 +842,20 @@ function updateChect(id){
     d3.select('#priceComp .axis')
              .transition().delay(50)
              .call(yAxis)
-
-
   }
+
+
+  function updateLegend(id){
+    var title = d3.select('#legend text#ryn')
+                  .text('район ' +id)
+                    
+  }
+  
   updateHtype(id, sample)
   updatePop(sample.pop2014,moscow.pop2014)
   updateSal(sample.salary2014,moscow.salary2014)
   updatePrice(sample,moscow)
+  updateLegend(id)
 }
 
 function getData(){
