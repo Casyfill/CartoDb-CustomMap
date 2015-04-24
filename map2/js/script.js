@@ -28,11 +28,11 @@ var cWidth
 var lYs=[]
 
 // links to map
-var maps = {'Северное Тушино': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/0583de02-e822-11e4-94a9-0e4fddd5de28/viz.json', 'coordinates':[55.864266,37.427031,12]},
-          'Щукино': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/4444049a-e823-11e4-ae67-0e853d047bba/viz.json', 'coordinates':[55.8016,37.4744,12]},
-          'Пресненский': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/2d628f02-e824-11e4-8d04-0e018d66dc29/viz.json', 'coordinates':[55.76032,37.561985,12]},
-          'Академический': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/2373319e-e825-11e4-b1d1-0e4fddd5de28/viz.json', 'coordinates':[55.68868, 37.577669, 12]},
-          'Выхино-Жулебино': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/b237159e-e825-11e4-80e1-0e9d821ea90d/viz.json', 'coordinates':[55.698634,37.825995,12]}
+var maps = {'Северное Тушино': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/0583de02-e822-11e4-94a9-0e4fddd5de28/viz.json', 'coordinates':[55.864266,37.427031,13]},
+          'Щукино': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/4444049a-e823-11e4-ae67-0e853d047bba/viz.json', 'coordinates':[55.8016,37.4744,13]},
+          'Пресненский': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/2d628f02-e824-11e4-8d04-0e018d66dc29/viz.json', 'coordinates':[55.76032,37.561985,13]},
+          'Академический': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/2373319e-e825-11e4-b1d1-0e4fddd5de28/viz.json', 'coordinates':[55.68868, 37.577669, 13]},
+          'Выхино-Жулебино': {'link':'https://rilosmaps.cartodb.com/u/rilos-katia/api/v2/viz/b237159e-e825-11e4-80e1-0e9d821ea90d/viz.json', 'coordinates':[55.698634,37.825995,13]}
   }
 
 Lookup = {};
@@ -121,23 +121,6 @@ function graphCharts(rayonId, datum){
                   .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
   
-  // function splitRangeEndOffset(range,num, offset){
-  //     // splits range into chinks without
-  //     var sh = (range[1]-range[0])/num
-      
-  //     r = [];
-  //     for (i=0, len = num; i<len; i++){
-  //     s = range[0] +(sh)*i
-  //     e = s + sh-offset
-  //     r.push([s,e])
-  //     }
-
-  //     return r
-  //   }
-
-  // console.log(splitRange([0,8],2))
-
-  // hs = splitRangeEndOffset([0,height],2, 70)
   var h = 80;
   g1 = charts.append('g')
             .attr('id','lPop')
@@ -147,7 +130,7 @@ function graphCharts(rayonId, datum){
             .attr('id','lSal')
             .attr("transform", "translate(0," + 148 + ")")
   // 
-  linechart(g2,[sample.salary2012 ,sample.salary2013 ,sample.salary2014],[2012,2013,2014],width,h, true, window.quantDict['salary2014'])
+  linechart(g2,[sample.salary2003, sample.salary2004, sample.salary2005, sample.salary2006, sample.salary2007, sample.salary2008, sample.salary2009, sample.salary2010, sample.salary2012 ,sample.salary2013 ,sample.salary2014],[2003,2004,2005,2006,2007,2008,2009,2010,2012,2013,2014],width,h, true, window.quantDict['salary2014'])
   linechart(g1,[sample.pop2002 ,sample.pop2010 ,sample.pop2012 ,sample.pop2013 ,sample.pop2014 ],[2002,2010,2012,2013,2014],width,h, false, window.quantDict['pop2014'])
 
 }
@@ -275,6 +258,7 @@ function createMap(mapId, mapLink){
             center_lon: 37.618013,
             legend:false,
             infowindow:true,
+            scrollwheel:true,
             zoom: 10
 
         })
@@ -315,7 +299,7 @@ function localMap(mapId, mapLink, lonlatzoom){
             center_lat: lonlatzoom[0],
             center_lon: lonlatzoom[1],
             zoom: lonlatzoom[2],
-            scrollwheel:false,
+            scrollwheel:true,
             infowindow:false
         })
         .done(function(vis, layers) {
@@ -714,6 +698,7 @@ function cChart(id){
         .attr('class', 'bLabel')
         .attr('id', function(d){return d[0]})
         .text(function(d){return d[1]})
+        .style('font-weight', 'bold')
 
 
 
@@ -772,7 +757,7 @@ function updateGraph(id){
       var sample = window.Lookup[id]
       
       var h = 80;
-      updateLinechart('lSal',[sample.salary2012 ,sample.salary2013 ,sample.salary2014],[2012,2013,2014],window.lgWidth,h, 50 )
+      updateLinechart('lSal',[sample.salary2003,sample.salary2004,sample.salary2005,sample.salary2006,sample.salary2007,sample.salary2008,sample.salary2009,sample.salary2010,sample.salary2012 ,sample.salary2013 ,sample.salary2014],[2003,2004,2005,2006,2007,2008,2009,2010,2012,2013,2014],window.lgWidth,h, 50 )
       updateLinechart('lPop',[sample.pop2002 ,sample.pop2010 ,sample.pop2012 ,sample.pop2013 ,sample.pop2014 ],[2002,2010,2012,2013,2014],window.lgWidth,h,50 )
   }
 
