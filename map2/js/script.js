@@ -37,6 +37,11 @@ var maps = {'Северное Тушино': {'link':'https://rilosmaps.cartodb.
 
 Lookup = {};
 
+var htypes = ['частные дома',
+             'многоэтажные жилье с адм',
+             'многоэтажное жилье',
+             'в строительстве']
+
 function maxRounded(mvalue){
   digits = mvalue.toString().length
 
@@ -326,7 +331,7 @@ function localMap(mapId, mapLink, lonlatzoom){
             
           }
 
-          minimizeLegend();  
+          // minimizeLegend();  
         
         })
         .error(function(err) {
@@ -430,17 +435,19 @@ function cChart(id){
   function htypeBars(g,sample,moscow){
   
 
-    var d = [sample.privatehousingpercent,
-             sample.multistoreyresadmpercentt,
-             sample.multistoreyrespercent,
-             sample.underconstructionpercent]
+    var d = [[sample.privatehousingpercent,window.htypes[0]],
+             [sample.multistoreyresadmpercentt,window.htypes[1]],
+             [sample.multistoreyrespercent,window.htypes[2]],
+             [sample.underconstructionpercent,window.htypes[3]]
+             ]
     
-    var m = [moscow.privatehousingpercent,
-             moscow.multistoreyresadmpercentt,
-             moscow.multistoreyrespercent,
-             moscow.underconstructionpercent]
+    var m = [[moscow.privatehousingpercent,window.htypes[0]],
+             [moscow.multistoreyresadmpercentt,window.htypes[1]],
+             [moscow.multistoreyrespercent,window.htypes[2]],
+             [moscow.underconstructionpercent,window.htypes[3]]
+             ]
 
-    
+    var htype = []
     
 
 
@@ -453,7 +460,7 @@ function cChart(id){
 
     function stackBar2(g,m,textRight,cls){
       summ=0
-      m.forEach(function(d){summ+=d})
+      m.forEach(function(d){summ+=d[0]})
       var y = d3.scale.linear().domain([0, summ]).range([0,height])
       
       if (textRight==true){
@@ -468,13 +475,21 @@ function cChart(id){
       }
       var h=0;
       
-      m = m.map(function(d){return [h, h+=d]})
+      m = m.map(function(d){return [h, h+=d[0], d[1]]})
       
       var stack = g.append('g')
                   .attr('class','stack')
                   .attr("transform", "translate("+x1+",0)")
-      
-      stack.selectAll('rect')
+
+      // var tip = d3.tip()
+      //     .attr('class', 'd3-tip')
+      //     .offset([-10, 0])
+      //     .html(function(d) {
+      //         return "<span>" + htype[m.indexOf(d)] + "</span>";
+      //     })            
+
+
+      var rects =stack.selectAll('rect')
       .data(m)
       .enter()
       .append('rect')
@@ -482,6 +497,7 @@ function cChart(id){
       .attr("width", '20px')
       .attr('y',function(d){return y(d[0])})
       .attr('height',function(d){return y(d[1]-d[0])})
+      
 
       stack.selectAll('text')
       .data(m)
@@ -494,8 +510,8 @@ function cChart(id){
       .attr('text-anchor',anchor);
 
     }
-    stackBar2(brs1,m,false,'msk')
-    stackBar2(brs2,d, true,'ryn')
+    stackBar2(brs1,m,false,'msk1')
+    stackBar2(brs2,d, true,'ryn1')
     }
   
   htypeBars(htype,sample,moscow)
@@ -772,18 +788,19 @@ function updateChect(id){
     var height = window.cHeight 
     
 
-    var m = [r.privatehousingpercent,
-            r.multistoreyresadmpercentt,
-            r.multistoreyrespercent,
-            r.underconstructionpercent]
+    var m = [[r.privatehousingpercent,window.htypes[0]],
+             [r.multistoreyresadmpercentt,window.htypes[1]],
+             [r.multistoreyrespercent,window.htypes[2]],
+             [r.underconstructionpercent,window.htypes[3]]
+             ]
 
     summ=0
-    m.forEach(function(d){summ+=d})
+    m.forEach(function(d){summ+=d[0]})
     var y = d3.scale.linear().domain([0, summ]).range([0,height])
 
     h = 0
-    m = m.map(function(d){return [h, h+=d]})
-
+    m = m.map(function(d){return [h, h+=d[0],d[1]]})
+    console.log(m)
     var stack = d3.select("#brs2 .stack")
 
     stack.selectAll('rect')
@@ -791,6 +808,7 @@ function updateChect(id){
         .transition().delay(50)
         .attr('y',function(d){return y(d[0])})
         .attr('height',function(d){return y(d[1]-d[0])})
+
 
     stack.selectAll('text')
         .data(m)
@@ -898,8 +916,9 @@ function getData(){
       barChart(dataset)
       graphCharts('Академический',dataset)
       cChart('Академический')
+      addListners()
       
-      
+  
     });
           
 }
@@ -919,6 +938,52 @@ function convertCoord(d){
       return arrays[0].map(function(_,i){
           return arrays.map(function(array){return array[i]})
       });
+  }
+
+
+  function addListners(){
+    // console.log(d3.selectAll('.msk1'))
+    
+    // var tip = d3.tip()
+    //   .attr('class', 'd3-tip')
+    //   .offset([-10, 0])
+    //   .html(function(d) {
+    //         return "<span style='color:red'>" + 'd.frequency' + "</span>";
+    //   })
+    var div = d3.select("#compareChart").append("div")  
+      .attr("class", "tooltip")       
+      .style("opacity", 0);
+    
+    d3.selectAll('.msk1')
+      .on("mouseover", function(d) {   
+            div.transition()    
+                .duration(200)    
+                .style("opacity", .9);    
+            div .html("<span style='color:white'>" + d[2]+'</span>')  
+                .style("left", (d3.event.pageX-50) + "px")   
+                .style("top", (d3.event.pageY - 28) + "px");  
+            })          
+        .on("mouseout", function(d) {   
+            div.transition()    
+                .duration(200)    
+                .style("opacity", 0); 
+        });
+
+
+    d3.selectAll('.ryn1')
+      .on("mouseover", function(d) {   
+            div.transition()    
+                .duration(200)    
+                .style("opacity", .9);    
+            div .html("<span style='color:white'>" + d[2]+'</span>')  
+                .style("left", (d3.event.pageX-50) + "px")   
+                .style("top", (d3.event.pageY - 28) + "px");  
+            })          
+        .on("mouseout", function(d) {   
+            div.transition()    
+                .duration(500)    
+                .style("opacity", 0); 
+        });
   }
 
     

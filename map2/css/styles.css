@@ -171,6 +171,30 @@ font-weight:bold;
 	stroke: white;
 }
 
+#compareChart .msk1 {
+	fill: red;
+	stroke-width:1;
+	stroke: white;
+}
+
+#compareChart .ryn1 {
+	fill: darkblue;
+	stroke-width:1.5;
+	stroke: white;
+}
+
+#compareChart .msk1:hover {
+	fill: rgb(205, 15, 0);
+	stroke-width:1;
+	stroke: white;
+}
+
+#compareChart .ryn1:hover {
+	fill: rgb(0, 13, 84);
+	stroke-width:1.5;
+	stroke: white;
+}
+
 #compareChart text.bLabel {
 	font-family: sans-serif;
 	font-size: 0.5em;
@@ -391,4 +415,18 @@ h6 {
 
 .graph polygon.linefill{
 	fill: url(#gradient)
-} 
+}
+
+div.tooltip {	
+    position: absolute;			
+    text-align: center;			
+    /*width: 60px;					
+    height: 28px;					*/
+    padding: 5px;				
+    font: 12px sans-serif;		
+    background: black;
+    fill:white;	
+    border: 0px;		
+    
+    pointer-events: none;			
+}
