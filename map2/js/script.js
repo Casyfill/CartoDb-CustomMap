@@ -259,28 +259,33 @@ function createMap(mapId, mapLink){
             search: false,
             zoomControl: true,
             tiles_loader: false,
-            center_lat: 55.799497,
-            center_lon: 37.618013,
+            center_lat: 55.742449, 
+            center_lon: 37.514049,
             legend:false,
             infowindow:true,
             scrollwheel:true,
-            zoom: 10
+            zoom: 9
 
         })
         .done(function(vis, layers) {
-          
-          // here goes all logis
+          // here goes all logics
           var sublayer = layers[1].getSubLayer(1);
+          sublayer.setInteraction(true)
           sublayer.on("featureClick",function(e, latlng, pos, data, layerIndex){mapClick(e, latlng, pos, data, layerIndex)})
-        })
+        
+            // sublayer.on("featureClick",function(e, latlng, pos, data, layerIndex){console.log(data)})
+            })
         .error(function(err) {
           console.log(err);
         });      
       }
+    
+
 
 function mapClick(e, latlng, pos, data, layerIndex) {
           // reaction on polygon click in the main map
           var id= data.namenew ;
+          console.log(id)
           
           d3.select('#rayonId').text('район '+id)
           d3.select('#RayonAnalysis').text('Сравнительный анализ, район '+id)
@@ -318,20 +323,7 @@ function localMap(mapId, mapLink, lonlatzoom){
           // map.setZoom(3);
           // map.panTo([50.5, 30.5]);
           
-          function minimizeLegend(){
-            //TODO: работает на чужую карту
-            var box = d3.selectAll('.cartodb-legend-stack').style('bottom','246px').style('right','5px')
-            box.select('.cartodb-legend').style('padding','6px').style('padding-bottom','0px')
-            box.select('.legend-title').style('margin-bottom','0px')
-
-            box.selectAll('.quartile').style('height','12px')
-            box.select('.colors').style('height','12px')
-
-            d3.select('.cartodb-zoom').style('margin-top','5px').style('margin-left','5px')
-            
-          }
-
-          // minimizeLegend();  
+          
         
         })
         .error(function(err) {
@@ -531,7 +523,7 @@ function cChart(id){
 
     // title
     g.append('text')
-     .text('Средняя цена жилья')
+     .text('Средняя цена жилья,')
      .attr('class','chTitle')
      .attr('y','11')
      .append('tspan')
@@ -594,7 +586,7 @@ function cChart(id){
 
   var popComp = mWindow.append('g')
                      .attr('id','popComp')
-                     .attr("transform", "translate(130,190)")
+                     .attr("transform", "translate(130,186)")
 
 
   function compPop(g, s,m){
@@ -640,7 +632,7 @@ function cChart(id){
 
   var salComp = mWindow.append('g')
                      .attr('id','salComp')
-                     .attr("transform", "translate(130,120)")
+                     .attr("transform", "translate(130,116)")
 
   function compSal(g, s,m){
     
@@ -689,7 +681,7 @@ function cChart(id){
   // legends
   var lgnd = mWindow.append('g')
                      .attr('id','legend')
-                     .attr("transform", "translate(130,248)")
+                     .attr("transform", "translate(130,238)")
   
   function legend(g){
     var data =[['msk','Москва',],['ryn',' район Академический']]
@@ -699,25 +691,22 @@ function cChart(id){
                 .enter()
                 .append('g')
                 .attr('class','row')
-                .attr("transform", function(d,i){return "translate("+i*60 +",0)"})
+                .attr("transform", function(d,i){return "translate(0,"+i*14 +")"})
 
     rows.append('rect')
         .attr('x', 0)
         .attr('y', 0)
-        .attr('width',15)
-        .attr('height',15)
+        .attr('width',12)
+        .attr('height',12)
         .attr('class', function(d){return d[0]})
 
     rows.append('text')
-        .attr('x', 20)
-        .attr('y', 10)
+        .attr('x', 15)
+        .attr('y', 8)
         .attr('class', 'bLabel')
         .attr('id', function(d){return d[0]})
         .text(function(d){return d[1]})
         .style('font-weight', 'bold')
-
-
-
 
     }
 
